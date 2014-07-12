@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta http-equiv="Content-Type" content="text/html; charset= ISO-8859-1" />
+    <!-- 1. Load platform.js for polyfill support. -->
+    <script src="components/platform/platform.js"></script>
+    <!-- 2. Use an HTML Import to bring in the element. -->
+    <link rel="import"
+        href="components/google-sheets/google-sheets.html">
+
+    <!-- 2. Use an HTML Import to bring in the element. -->
+    <link rel="import" href="components/polymer/polymer.html">
+    <link rel="import" href="components/olbapro-datasheet/olbapro-datasheet.html">
+
+    <link rel="import" href="components/paper-input/paper-input.html">
+    <link rel="import" href="components/paper-slider/paper-slider.html">
+    <link rel="import" href="components/paper-radio-group/paper-radio-group.html">
+    <link rel="import" href="components/paper-radio-button/paper-radio-button.html">
+    <link rel="import" href="components/paper-fab/paper-fab.html">
+    <link rel="import" href="components/core-icons/core-icons.html">
+    <link rel="import" href="components/core-ajax/core-ajax.html">
+    <link rel="import" href="components/core-localstorage/core-localstorage.html">
+     <link rel="import" href="components/google-map/google-map.html">
+      <link rel="import" href="components/google-map/google-map-search.html">
+    <link rel="import" href="components/core-header-panel/core-header-panel.html">
+<link rel="import" href="components/core-toolbar/core-toolbar.html">
+     <link rel="import" href="components/core-icon-button/core-icon-button.html">
+     <link rel="import" href="components/paper-shadow/paper-shadow.html">
+
+    <link rel="import" href="components/paper-tabs/paper-tabs.html">
+    <link rel="import" href="components/paper-tabs/paper-tab.html">
+    <link rel="import" href="components/core-animated-pages/core-animated-pages.html">
+    <link rel="import" href="components/core-animated-pages/transitions/hero-transition.html">
+    <link rel="import" href="components/core-animated-pages/transitions/cross-fade.html">
+    <link rel="import" href="components/core-animated-pages/transitions/slide-down.html">
+    <link rel="import" href="components/core-animated-pages/transitions/slide-up.html">
+    <link rel="import" href="components/core-animated-pages/transitions/tile-cascade.html">
+
+    <link rel="import" href="app-listocrd.html">
+    <link rel="import" href="app-ocrd.html">
+    <link rel="import" href="app-ocrddireccion.html">
+    <link rel="import" href="app-login.html">
+    <style>
+        body {
+            margin: 0;
+            font-family: Tahoma;
+    
+        }
+    </style>
+   
+</head>
+   
+<body>
+    <polymer-element name="my-element">
+
+  <template>
+    <style>
+       
+
+        :host {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+      }
+
+        #core_animated_pages
+        {
+            position: absolute;
+            width: 100%; /*  360px*/
+            height: 100%; /* 382px */
+      overflow: hidden;
+            background-color: rgb(238, 238, 238);
+        }
+
+             
+
+    </style>
+    <core-localstorage name="searchOcrd" value="{{searchOcrd}}"></core-localstorage>
+    <core-localstorage id="localrowsOcrd" name="rowsOcrd" value="{{rowsOcrd}}"></core-localstorage>
+    <core-localstorage id="username" name="user" value="{{user}}"></core-localstorage>
+    <core-localstorage id="password" name="password" value="{{password}}"></core-localstorage>
+
+    <olbapro-datasheet tableName="OCRD" keyColumn="cardcode"  appsScriptID="AKfycbzCNQNo5hxEe6BoqCOGdCmqggkEdL6eZAskEffrxeysBGIO32A" id="olbapro_datasheet" on-postupdate="{{postCommit}}" on-postinsert="{{postCommit}}" rows="{{rowsOcrd}}" user="{{user}}" password="{{password}}">
+        <olbapro-datasheetdetail tableName="OCRD_DIRECCIONES" id="ocrd_direcciones" keyColumn="address"  on-postupdate="{{postCommitDetail}}" on-postinsert="{{postCommitDetail}}"></olbapro-datasheetdetail>
+    </olbapro-datasheet>
+
+    <core-animated-pages  selected="{{core_selected}}" selectedindex="0" notap id="core_animated_pages" >
+        <section class="seccion">
+          <app-login user="{{user}}" password="{{password}}" on-login="{{login}}"></app-login>
+        </section>
+    
+         <section>
+             <app-listocrd id="listocrd" search="{{searchOcrd}}" rows="{{rowsOcrd}}" on-tapcard="{{tapOcrdList}}" on-addocrd="{{clickAddOcrd}}" on-refreshlist="{{refreshOcrd}}"></app-listocrd>
+         </section>
+        <section>
+            <app-ocrd id="ocrd" row="{{$.olbapro_datasheet.currentRow}}" on-back="{{dataBack}}" on-save="{{saveOcrd}}"
+            on-tapdirection="{{tapDirection}}" on-adddirection="{{clickAddDirection}}"></app-ocrd>
+        </section>
+         <section id="section1">
+             <app-ocrddireccion id="app_ocrddireccion" direction="{{$.ocrd_direcciones.currentRow}}" on-back="{{directionBack}}" on-save="{{saveOcrdDirection}}" ></app-ocrddireccion>
+         </section>
+    </core-animated-pages>
+
+  </template>
+
+
+  <script>
+      Polymer('my-element', {
+          ready: function () {
+            this.user="manager";
+            this.password="secure";
+          },
+          login:function(){
+              this.$.core_animated_pages.selected = 1;
+          },
+          tapOcrdList: function () {
+              this.$.olbapro_datasheet.position = this.$.listocrd.selected;
+              this.$.core_animated_pages.selected = 2;
+          },
+          postCommit: function () {
+              this.$.ocrd.postUpdate();
+              this.$.localrowsOcrd.save();
+          },
+          postCommitDetail: function () {
+            
+              this.$.app_ocrddireccion.postUpdate();
+              this.$.localrowsOcrd.save();
+          },          
+          saveOcrd: function () {
+              if (this.$.olbapro_datasheet.position == -1) {
+                  this.$.olbapro_datasheet.addCurrentRow();
+              }
+              else {
+                  this.$.olbapro_datasheet.updateCurrentRow();
+              }
+          },
+          saveOcrdDirection: function () {
+              if (this.$.ocrd_direcciones.position == -1) { /* add */
+                this.$.ocrd_direcciones.addCurrentRow();
+              } else {  /* Update */
+                this.$.ocrd_direcciones.updateCurrentRow();
+              }
+          },
+          dataBack: function () {
+              this.$.core_animated_pages.selected = 1;
+          },
+          directionBack: function () {
+              this.$.core_animated_pages.selected = 2;
+          },
+          refreshOcrd: function () {
+              this.rowsOcrd = [];
+              this.$.olbapro_datasheet.getData();
+          },
+          tapDirection: function () {
+            this.$.ocrd_direcciones.position = this.$.ocrd.direction;
+            this.$.core_animated_pages.selected = 3;
+          },
+          clickAddOcrd: function () {
+  
+              this.$.olbapro_datasheet.position = -1;
+              this.$.olbapro_datasheet.currentRow = { cardcode: "", cardname: "", cardtype: "Supplier",recicled:"N", OCRD_DIRECCIONES: [] };
+              this.$.core_animated_pages.selected = 2;
+          },
+          clickAddDirection:function(){
+              this.$.ocrd_direcciones.position=-1;
+              this.$.ocrd_direcciones.currentRow={address:"",street: "",city : "",state:"",zip:"",country:""};
+              this.$.core_animated_pages.selected = 3;
+          }
+
+      });
+
+  </script>
+
+</polymer-element>
+    <my-element></my-element>
+
+    <script type="text/javascript">
+        if (typeof String.prototype.startsWith != 'function') {
+            // see below for better implementation!
+            String.prototype.startsWith = function (str) {
+                return this.indexOf(str) == 0;
+            };
+        }
+    </script>
+</body>
+</html>

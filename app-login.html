@@ -1,0 +1,68 @@
+<polymer-element name="app-login" attributes="user password">
+    <template>
+        <style>
+          #txtUser
+          {
+            width: 200px;
+          }        
+          #txtPassword
+          {
+            width: 200px;
+          }        
+
+          #cmdLogin
+          {
+            position: absolute;
+              right: 10px;
+              top: 340px;
+          }
+          #toolbar
+          {
+            background: url("images/login.jpg") no-repeat center;
+           background-color: white;
+           background-size: 300px 140px;
+          }
+          #panelHeader
+          {
+            background-color: white;
+        
+              height:5000px;
+          }
+          core-scroll-header-panel {
+                  position: absolute;
+                  top: 0;
+                  right: 0;
+                  bottom: 0;
+                  left: 0;
+                  width:100%;
+                  height:100%;
+                  
+                }
+        </style>
+        <core-scroll-header-panel condenses >
+          <core-toolbar class="tall" id="toolbar"   >
+                  
+          </core-toolbar>
+          <div content id="panelHeader" vertical layout center >
+<paper-input id="txtUser" label="User"  floatinglabel inputvalue="" value="{{ user}}"></paper-input>
+            <paper-input id="txtPassword" label="Password"  floatinglabel inputvalue="" value="{{password}}" ></paper-input>
+            <paper-fab icon="arrow-forward"  class="mini" id="cmdLogin"  on-click="{{login}}" ></paper-fab>
+           
+          </div>
+          
+      </core-scroll-header-panel>
+            
+
+    </template>
+          
+    <script>
+        Polymer('app-login', {
+            ready: function () {
+            },
+            login: function () {
+                this.fire("login");
+            }
+
+        });
+        </script>
+</polymer-element>

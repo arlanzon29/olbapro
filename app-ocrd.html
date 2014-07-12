@@ -1,0 +1,126 @@
+<polymer-element name="app-ocrd" attributes="row direction">
+    <template>
+        <style>
+            .dataCard
+            {
+                margin: 8px;
+                background-color: rgb(238, 238, 238);
+                border-radius: 4px;
+                height: 100%;
+            }
+
+            #cmdBack
+            {
+                position: absolute;
+                right: 20px;
+                top: 20px;
+            }
+            #cmdAddDirection
+            {
+                position: absolute;
+                right: 20px;
+                top: 20px;
+            }
+
+            #cmdSave
+            {
+                position: absolute;
+                right: 20px;
+                top: 80px;
+            }
+
+            #txtCardcode
+            {
+                width: 300px;
+            }
+
+            #paper_tabs
+            {
+                width: 100%;
+                color: rgb(255, 255, 255);
+                box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 2px;
+                background-color: rgb(0, 188, 212);
+            }
+
+            .cardDirection
+            {
+                position: relative;
+                height: 60px;
+                width: 80%;
+                margin: 8px;
+                background-color: tomato;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+        </style>
+            <paper-tabs bottom selected="{{ coredetail_selected }}" selectedindex="0" id="paper_tabs">
+             <paper-tab id="paper_tab" active>Generales</paper-tab>
+             <paper-tab id="paper_tab1">Direcciones</paper-tab>
+           </paper-tabs>
+             <core-animated-pages  class="dataCard" selected="{{ coredetail_selected }}" hero-id="div" cross-fade hero?="{{true}}"  hero-p selectedindex="0" notap id="Core-animated-detail" transitions="cross-fade-all hero-transition" >
+            <section>
+                <div id="div"  active vertical layout  >
+                  
+                  <paper-input label="Codigo cliente" hero-id="cardcode" floatinglabel inputvalue="" value="{{ row.cardcode }}" id="txtCardcode" on-keyup="{{ keypressHandler }}" hero?={{true}} ></paper-input>
+                  <paper-input label="Razon social" floatinglabel inputvalue="" hero-id="cardname" hero?={{true}} value="{{ row.cardname }}" id="paper_input1" on-keyup="{{ keypressHandler }}" hero-id="cardname" ></paper-input>
+                  <paper-radio-group selected="{{ row.cardtype }}" selectedindex="0" id="paper_radio_group" layout vertical >
+                      <paper-radio-button  label="Customer" id="paper_radio_button" name="Customer" on-click="{{ keypressHandler }}"></paper-radio-button>
+                      <paper-radio-button  label="Supplier" id="paper_radio_button1" name="Supplier" on-click="{{ keypressHandler }}"></paper-radio-button>
+                   </paper-radio-group>  
+                    <paper-fab icon="arrow-back" hero-id="boton" class="mini" id="cmdBack" on-click="{{dataBack}}" ></paper-fab>        
+                     <paper-fab icon="save" class="mini" id="cmdSave" hidden on-click="{{save}}" ></paper-fab>
+         
+                 </div>
+       
+              
+            </section> 
+            <section>
+                 <div id="Div1" flex horizontal wrap around-justified layout >
+                
+                    <template repeat="{{direction,i in row.OCRD_DIRECCIONES}}">
+                      <div class="cardDirection" id="divDir{{i}}" on-tap="{{directionClick}}"  vertical center center-justified layout>
+                      <paper-shadow  z="2"></paper-shadow>
+                      <span >{{direction.address}}</span>
+              
+                      <span >{{direction.street}}</span>
+                          <span >{{direction.zip}}-{{direction.city}}</span>
+                      </div>
+              
+                    </template>
+
+                    <paper-fab icon="add" class="mini" id="cmdAddDirection" on-click="{{addDirection}}" ></paper-fab>
+                  </div>
+             </section>
+            </core-animated-pages> 
+            
+    </template>
+          
+    <script>
+        Polymer('app-ocrd', {
+            ready: function () {
+            },
+            dataBack: function () {
+                this.fire("back");
+            },
+            keypressHandler: function () {
+                this.$.cmdSave.hidden = false;
+            },
+            save: function () {
+                this.fire("save");
+            },
+            postUpdate: function () {
+                this.$.cmdSave.hidden = true;
+            },
+            directionClick:function() {
+              
+              this.direction = parseInt(event.currentTarget.id.substring(6));
+              this.fire("tapdirection");
+  
+            },
+            addDirection:function(){
+              this.fire("adddirection");
+            }
+
+        });
+        </script>
+</polymer-element>

@@ -1,0 +1,121 @@
+<polymer-element name="app-listocrd" attributes="search rows selected">
+     <template>
+         <style>
+          
+               #fabRefresh
+                {
+                    position:absolute;
+                   left:300px;
+                   top:0px;
+                }
+                 #fabAdd
+                {
+                    position:absolute;
+                   left:300px;
+                   top:42px;
+                }
+                #search {
+                    width:75%;
+                }
+                .card {
+                    position: relative;
+                    height: 100px;
+                    width: 100px;
+      
+                    margin: 8px;
+                    background-color: tomato;
+                    border: 1px  solid black;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    color:white;
+                }
+                 .listCardCode{
+                      position: absolute;
+                      bottom: 0;
+                      border: 1px;
+                      border-top: solid 1px yellow;
+                      width: 100%;
+                      text-align: center;
+                      color:gray;
+                 }
+                core-header-panel {
+                  position: absolute;
+                  top: 0;
+                  right: 0;
+                  bottom: 0;
+                  left: 0;
+                  width:100%;
+                  height:100%;
+                  
+                }
+             .lblCardname
+             {
+                 width:100%;
+                 text-align:center;
+             }
+            
+               
+         </style>
+         
+     
+
+
+           <core-header-panel>
+                <core-toolbar  id="toolbar" class="core-header" >
+                    <paper-input label="Search Bussiness Partner"    inputvalue="" value="{{search}}" id="search" >
+                    </paper-input>
+
+                       <core-icon-button icon="refresh" on-click="{{refreshOcrd}}"></core-icon-button>
+                      <core-icon-button icon="add" on-click="{{addOcrd}}"></core-icon-button>
+                </core-toolbar>
+                <div class="content"  flex horizontal wrap around-justified layout content id="contenido">
+                
+                   <template repeat="{{row,i in rows}}">
+                      <div class="card" id="div{{i}}" style="background-color:{{listBackColor(row)}}" hero-id="div" cross-fade vertical center center-justified layout  hero?="{{i===selected}}" on-tap="{{selectView}}" hidden?="{{!compareList(search,row)}}">
+                      <paper-shadow  z="2"></paper-shadow>
+                      <span class="lblCardname" horizontal center style="">{{row.cardname}}</span>
+              
+                      <span class="listCardCode" center center-justified>{{row.cardcode}}</span>
+                      </div>
+              
+                    </template>
+                </div>
+          </core-header-panel>
+
+      </template>
+    <script>
+        Polymer('app-listocrd', {
+            ready: function () {
+            },
+            addOcrd: function () {
+                this.fire("addocrd");
+            },
+            selectView: function (event) {
+
+                this.selected = parseInt(event.currentTarget.id.substring(3));;
+                this.fire("tapcard");
+
+
+            },
+            compareList: function (value, row) {
+                if (row.cardcode.startsWith(value) || row.cardname.startsWith(value)) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            },
+            listBackColor: function (row) {
+                if (row.cardtype == "Supplier") {
+                    return "tomato";
+                } else {
+                    return "orange";
+                }
+
+            },
+            refreshOcrd: function () {
+                this.fire("refreshlist");
+            }
+        });
+   </script>
+</polymer-element>

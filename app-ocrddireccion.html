@@ -1,0 +1,105 @@
+<polymer-element name="app-ocrddireccion" attributes="direction">
+    <template>
+        <style>
+              #paper_tabs
+            {
+                width: 100%;
+                color: rgb(255, 255, 255);
+                box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 2px;
+                background-color: rgb(0, 188, 212);
+            }
+            #google_map {
+                width: 100%;
+                height: 600px;
+                display: block;
+                position: absolute;
+                top: 0px;
+                left: 0px;
+              
+            }
+             #cmdBack
+            {
+                position: absolute;
+                right: 20px;
+                top: 20px;
+            }
+               #cmdSave
+            {
+                position: absolute;
+                right: 20px;
+                top: 80px;
+            }
+        </style>
+               
+         <paper-tabs selected="{{selected }}" on-click={{clickTab}} selectedindex="0" id="paper_tabs">
+             <paper-tab id="paper_tab" active>Direccion</paper-tab>
+             <paper-tab id="paper_tab1" on-click={{clickTab}}>Map</paper-tab>
+           </paper-tabs>
+           <core-animated-pages  class="dataCard" selected="{{ selected }}" hero-id="div" cross-fade hero?="{{true}}"  hero-p selectedindex="0" notap id="Core-animated-detail" transitions="cross-fade-all hero-transition" >
+            <section>            
+                   
+                <paper-input label="Nombre Direccion"  floatinglabel inputvalue="" value="{{ direction.address}}" on-keyup="{{ keypressHandler }}"  ></paper-input>
+                <paper-input label="Calle"  floatinglabel inputvalue="" value="{{ direction.street}}" on-keyup="{{ keypressHandler }}"  ></paper-input>
+                <paper-input label="Codigo Postal"  floatinglabel inputvalue="" value="{{ direction.zip}}" on-keyup="{{ keypressHandler }}"  ></paper-input>
+                <paper-input label="Ciudad"  floatinglabel inputvalue="" value="{{ direction.city}}" on-keyup="{{ keypressHandler }}"  ></paper-input>
+                <paper-input label="Provincia"  floatinglabel inputvalue="" value="{{ direction.state}}" on-keyup="{{ keypressHandler }}"  ></paper-input>
+                <paper-input label="País"  floatinglabel inputvalue="" value="{{ direction.country}}" on-keyup="{{ keypressHandler }}"  ></paper-input>          
+                <paper-fab icon="arrow-back" hero-id="boton" class="mini" id="cmdBack" on-click="{{dataBack}}" ></paper-fab>     
+                 <paper-fab icon="save" class="mini" id="cmdSave" hidden on-click="{{save}}" ></paper-fab>
+            </section> 
+            <section id="">
+            <div id="map">
+                <google-map latitude="{{ $.google_map_search.result.latitude }}" longitude="{{ $.google_map_search.result.longitude }}" showCenterMarker  zoom="18" id="google_map">
+                      <google-map-marker latitude="{{ $.google_map_search.result.latitude }}" longitude="{{ $.google_map_search.result.longitude }}"
+                         title="{{ direction.address}}" draggable="false">
+       
+                </google-map-marker>
+
+                </google-map>
+                <google-map-search query="{{query}}" map="{{ $.google_map.map }}" id="google_map_search"></google-map-search>
+            </div>
+             </section>
+            </core-animated-pages> 
+    </template>
+          
+    <script>
+        Polymer('app-ocrddireccion', {
+            ready: function () {
+                this.direction = {
+                    address:"",
+                    street: "",
+                    city : "",
+                    state:"",
+                    zip:"",
+                    country:""
+                }
+               
+               /* this.query = this.direction.street + "," + this.direction.zip + " " + this.direction.city + "," + this.direction.state + "+", +this.direction.country;*/
+                                 
+            },
+            changeMap:function (){
+                this.query = this.direction.street + "," + this.direction.zip + " " + this.direction.city + "," + this.direction.state + "+", +this.direction.country;
+            },
+            clickTab:function(){
+                this.query = this.direction.street + "," + this.direction.zip + " " + this.direction.city + "," + this.direction.state + "+", +this.direction.country;
+              this.$.google_map.resize();
+            },
+            dataBack: function () {
+                this.fire("back");
+            },
+            keypressHandler: function () {
+                this.$.cmdSave.hidden = false;
+            },
+            save: function () {
+                this.fire("save");
+            },
+            postUpdate: function () {             
+                this.$.cmdSave.hidden = true;
+            }
+     
+
+        });
+
+
+        </script>
+</polymer-element>

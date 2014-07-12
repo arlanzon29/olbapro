@@ -1,0 +1,23 @@
+{
+  "name": "spread",
+  "version": "0.0.1",
+  "description": "Database Spread Sheet Polymer",
+  "main": "index.html",
+  "authors": [
+    "Dani"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#~0.3.4",
+    "core-elements": "Polymer/core-elements#~0.3.4",
+    "paper-elements": "Polymer/paper-elements#~0.3.4",
+    "google-apis": "PolymerLabs/google-apis#~0.3.0"
+  }
+}

@@ -1,0 +1,197 @@
+
+   
+
+
+    <polymer-element name="olbapro-datasheet" attributes="position rows currentRow tableName appsScriptID keyColumn user password">
+      <template>
+        <core-ajax id="getAjax"
+            url="https://script.google.com/macros/s/{{appsScriptID}}/exec?method=getTable&table={{tableName}}&user={{user}}&password={{password}}" handleAs="json" method="GET"  response="{{rows}}" on-core-response="{{sheetData}}"></core-ajax>
+        <core-ajax id="updateAjax"
+            url="https://script.google.com/macros/s/{{appsScriptID}}/exec?user={{user}}&password={{password}}" handleAs="json" method="POST" body="{{updateData}}" on-core-response="{{handleResponse}}"></core-ajax>
+       
+      </template>
+      <script>
+          Polymer('olbapro-datasheet', {
+              position: -999,
+              ready: function () {
+              },
+              getData: function () {
+                  this.$.getAjax.go();
+
+              },
+              sheetData: function () {
+                  this.position = -999;
+              },
+              positionChanged: function (attrName, oldVal, newVal) {
+                  if (this.rows != null && this.position>=0) {
+                      this.currentRow = JSON.parse(JSON.stringify(this.rows[this.position]));                      
+                  }
+
+              },
+              updateCurrentRow: function () {
+                  var newValues = {};
+                  var oldValues = {};
+                  var data = [{ "table": this.tableName, "operation": "Update", "key": this.currentRow[this.keyColumn], "newvalues": newValues, "oldvalues": oldValues }];
+
+                  var oldRow = this.rows[this.position];
+                  for (var property in this.currentRow) {
+                      if (this.currentRow[property] != oldRow[property]) {
+                          newValues[property] = this.currentRow[property];
+                          oldValues[property] = oldRow[property];
+                      }
+                  }
+                  this.updateData = JSON.stringify(data);
+                  this.lastDetailName="";
+                  this.lastPositionDetail=-1;
+                  this.$.updateAjax.go();
+              },
+              addCurrentRow: function () {
+                  var newValues = {};
+                  var oldValues = {};
+                  var data = [{ "table": this.tableName, "operation": "Insert", "key": this.currentRow[this.keyColumn], "newvalues": newValues, "oldvalues": oldValues }];
+
+                  for (var property in this.currentRow) {
+                      if (!Array.isArray(this.currentRow[property])) {
+                          newValues[property] = this.currentRow[property];
+                      }
+                  }
+                  this.updateData = JSON.stringify(data);
+                  this.$.updateAjax.go();
+              },
+              handleResponse: function (response) {
+                  if (response.detail.response.lastError == "") {
+                      if (this.position != -1) {
+                          var oldRow = this.rows[this.position];
+                          for (var property in this.currentRow) {
+                             
+                              oldRow[property] = this.currentRow[property];
+                          }
+
+                          this.fire("postupdate");
+                      } else {
+                          var oldRow = {};
+                          for (var property in this.currentRow) {
+                              oldRow[property] = this.currentRow[property];
+                          }
+                          this.rows.push(oldRow);
+
+                          this.fire("postinsert");
+                      }
+                     
+                  } else {
+                      alert(response.detail.response.lastError);
+                  }
+
+              }
+           
+          });
+       </script>
+    </polymer-element>
+
+
+ <polymer-element name="olbapro-datasheetdetail" attributes="position rows currentRow tableName keyColumn">
+      <template>
+       <core-ajax id="updateAjax"
+            url="https://script.google.com/macros/s/{{appsScriptID}}/exec?user={{user}}&password={{password}}" handleAs="json" method="POST" body="{{updateData}}" on-core-response="{{handleResponse}}"></core-ajax>
+
+      </template>
+      <script>
+          Polymer('olbapro-datasheetdetail', {
+              position: -999,
+              ready: function () {
+                
+
+              },
+              positionChanged: function (attrName, oldVal, newVal) {
+                  if (this.position != -1) {
+                      var rowsDetail = this.parentElement.currentRow[this.tableName]
+                      this.currentRow = rowsDetail[this.position];
+                  }
+
+              },
+               updateCurrentRow: function () {
+                      var newValues = {};
+                      var oldValues = {};
+                      var data = [{ "table": this.tableName, "operation": "Update", "key": this.parentElement.currentRow[this.parentElement.keyColumn], "key2": "", "newvalues": newValues, "oldvalues": oldValues }];
+
+                      var row = this.parentElement.rows[this.parentElement.position];
+                      var detail = row[this.tableName];
+                      var oldRow = detail[this.position];
+
+                      data[0].key2 = oldRow[this.keyColumn];
+
+                      var curRow = this.currentRow
+                     
+
+                      for (var property in curRow) {
+                          if (curRow[property] != oldRow[property]) {
+                              newValues[property] = curRow[property];
+                              oldValues[property] = oldRow[property];
+                          }
+                      }
+                      this.updateData = JSON.stringify(data);
+                      this.appsScriptID = this.parentElement.appsScriptID;
+                      this.user = this.parentElement.user;
+                      this.password = this.parentElement.password;
+                      this.$.updateAjax.go();
+               },
+              addCurrentRow: function () {
+                  var newValues = {};
+                  var oldValues = {};
+                  var data = [{ "table": this.tableName, "operation": "Insert", "key": this.parentElement.currentRow[this.parentElement.keyColumn], "key2": "", "newvalues": newValues, "oldvalues": oldValues }];
+
+                  var curRow = this.currentRow
+                  data[0].key2 = curRow[this.keyColumn];                 
+                  newValues[this.parentElement.keyColumn] = this.parentElement.currentRow[this.parentElement.keyColumn];
+
+                  for (var property in curRow) {
+                    newValues[property] = curRow[property];
+                  }
+                  this.updateData = JSON.stringify(data);
+                  this.appsScriptID = this.parentElement.appsScriptID;
+                  this.user = this.parentElement.user;
+                  this.password = this.parentElement.password;
+                  this.$.updateAjax.go();
+              },
+
+               handleResponse: function (response) {
+                   if (response.detail.response.lastError == "") {
+                       if (this.position != -1) {
+                         var row = this.parentElement.rows[this.parentElement.position];
+                         var detail = row[this.tableName];
+                         var oldRow = detail[this.position];
+
+                         var curRow = this.currentRow
+
+                         for (var property in curRow) {
+                             if (curRow[property] != oldRow[property]) {
+                                 oldRow[property] = curRow[property];
+                             }
+                         }
+
+                         this.fire("postupdate");
+                       } else {
+                         var oldRow = {};
+                         for (var property in this.currentRow) {
+                             oldRow[property] = this.currentRow[property];
+                         }
+                         var row = this.parentElement.rows[this.parentElement.position];
+                         var detail = row[this.tableName];
+                         detail.push(oldRow);
+
+                         this.parentElement.currentRow[this.tableName].push(oldRow);    
+
+                         this.position=detail.length-1;
+
+                         this.fire("postinsert");
+                       }
+
+                   } else {
+                       alert(response.detail.response.lastError);
+                   }
+
+               }
+
+          });
+       </script>
+    </polymer-element>
