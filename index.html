@@ -83,8 +83,8 @@
     <core-localstorage id="username" name="user" value="{{user}}"></core-localstorage>
     <core-localstorage id="password" name="password" value="{{password}}"></core-localstorage>
 
-    <olbapro-datasheet tableName="OCRD" keyColumn="cardcode"  appsScriptID="AKfycbzCNQNo5hxEe6BoqCOGdCmqggkEdL6eZAskEffrxeysBGIO32A" id="olbapro_datasheet" on-postupdate="{{postCommit}}" on-postinsert="{{postCommit}}" rows="{{rowsOcrd}}" user="{{user}}" password="{{password}}">
-        <olbapro-datasheetdetail tableName="OCRD_DIRECCIONES" id="ocrd_direcciones" keyColumn="address"  on-postupdate="{{postCommitDetail}}" on-postinsert="{{postCommitDetail}}"></olbapro-datasheetdetail>
+    <olbapro-datasheet tableName="OCRD" keyColumn="cardcode"  appsScriptID="AKfycbzCNQNo5hxEe6BoqCOGdCmqggkEdL6eZAskEffrxeysBGIO32A" id="olbapro_datasheet" on-postupdate="{{postCommit}}" on-postinsert="{{postCommit}}" on-postdelete="{{postDelete}}" rows="{{rowsOcrd}}" user="{{user}}" password="{{password}}">
+        <olbapro-datasheetdetail tableName="OCRD_DIRECCIONES" id="ocrd_direcciones" keyColumn="address"  on-postupdate="{{postCommitDetail}}" on-postinsert="{{postCommitDetail}}" ></olbapro-datasheetdetail>
     </olbapro-datasheet>
 
     <core-animated-pages  selected="{{core_selected}}" selectedindex="0" notap id="core_animated_pages" >
@@ -96,7 +96,7 @@
              <app-listocrd id="listocrd" search="{{searchOcrd}}" rows="{{rowsOcrd}}" on-tapcard="{{tapOcrdList}}" on-addocrd="{{clickAddOcrd}}" on-refreshlist="{{refreshOcrd}}"></app-listocrd>
          </section>
         <section>
-            <app-ocrd id="ocrd" row="{{$.olbapro_datasheet.currentRow}}" on-back="{{dataBack}}" on-save="{{saveOcrd}}"
+            <app-ocrd id="ocrd" row="{{$.olbapro_datasheet.currentRow}}" on-back="{{dataBack}}" on-save="{{saveOcrd}}" on-delete="{{deleteOcrd}}"
             on-tapdirection="{{tapDirection}}" on-adddirection="{{clickAddDirection}}"></app-ocrd>
         </section>
          <section id="section1">
@@ -124,6 +124,10 @@
               this.$.ocrd.postUpdate();
               this.$.localrowsOcrd.save();
           },
+          postDelete: function () {
+            this.rowsOcrd.splice(this.$.olbapro_datasheet.position, 1);
+            this.$.core_animated_pages.selected = 1;
+          },
           postCommitDetail: function () {
             
               this.$.app_ocrddireccion.postUpdate();
@@ -135,6 +139,14 @@
               }
               else {
                   this.$.olbapro_datasheet.updateCurrentRow();
+              }
+          },
+          deleteOcrd: function () {
+              if (this.$.olbapro_datasheet.position == -1) {
+                
+              }
+              else {
+                  this.$.olbapro_datasheet.deleteCurrentRow();
               }
           },
           saveOcrdDirection: function () {

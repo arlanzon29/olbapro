@@ -8,6 +8,8 @@
             url="https://script.google.com/macros/s/{{appsScriptID}}/exec?method=getTable&table={{tableName}}&user={{user}}&password={{password}}" handleAs="json" method="GET"  response="{{rows}}" on-core-response="{{sheetData}}"></core-ajax>
         <core-ajax id="updateAjax"
             url="https://script.google.com/macros/s/{{appsScriptID}}/exec?user={{user}}&password={{password}}" handleAs="json" method="POST" body="{{updateData}}" on-core-response="{{handleResponse}}"></core-ajax>
+        <core-ajax id="deleteAjax"
+            url="https://script.google.com/macros/s/{{appsScriptID}}/exec?user={{user}}&password={{password}}" handleAs="json" method="POST" body="{{deleteData}}" on-core-response="{{handleResponseDelete}}"></core-ajax>
        
       </template>
       <script>
@@ -41,10 +43,17 @@
                       }
                   }
                   this.updateData = JSON.stringify(data);
-                  this.lastDetailName="";
-                  this.lastPositionDetail=-1;
                   this.$.updateAjax.go();
               },
+              deleteCurrentRow: function () {
+                  var newValues = {};
+                  var oldValues = {};
+                  var data = [{ "table": this.tableName, "operation": "Delete", "key": this.currentRow[this.keyColumn], "newvalues": newValues, "oldvalues": oldValues }];
+
+                  
+                  this.deleteData = JSON.stringify(data);
+                  this.$.deleteAjax.go();
+              },              
               addCurrentRow: function () {
                   var newValues = {};
                   var oldValues = {};
@@ -76,6 +85,19 @@
                           this.rows.push(oldRow);
 
                           this.fire("postinsert");
+                      }
+                     
+                  } else {
+                      alert(response.detail.response.lastError);
+                  }
+
+              },
+              handleResponseDelete: function (response) {
+                  if (response.detail.response.lastError == "") {
+                      if (this.position != -1) {
+                          this.fire("postdelete");
+                      } else {
+                          this.fire("postdelete");
                       }
                      
                   } else {

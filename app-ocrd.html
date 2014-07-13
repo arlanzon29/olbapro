@@ -22,11 +22,17 @@
                 top: 20px;
             }
 
-            #cmdSave
+            #cmdDelete
             {
                 position: absolute;
                 right: 20px;
                 top: 80px;
+            }
+            #cmdSave
+            {
+                position: absolute;
+                right: 20px;
+                top: 120px;
             }
 
             #txtCardcode
@@ -67,7 +73,9 @@
                       <paper-radio-button  label="Customer" id="paper_radio_button" name="Customer" on-click="{{ keypressHandler }}"></paper-radio-button>
                       <paper-radio-button  label="Supplier" id="paper_radio_button1" name="Supplier" on-click="{{ keypressHandler }}"></paper-radio-button>
                    </paper-radio-group>  
-                    <paper-fab icon="arrow-back" hero-id="boton" class="mini" id="cmdBack" on-click="{{dataBack}}" ></paper-fab>        
+                    <paper-fab icon="arrow-back" hero-id="boton" class="mini" id="cmdBack" on-click="{{dataBack}}" ></paper-fab>     
+                    <paper-fab icon="delete" class="mini" id="cmdDelete" on-click="{{delete}}" ></paper-fab>
+        
                      <paper-fab icon="save" class="mini" id="cmdSave" hidden on-click="{{save}}" ></paper-fab>
          
                  </div>
@@ -107,6 +115,9 @@
             },
             save: function () {
                 this.fire("save");
+            },
+            delete: function () {
+                this.fire("delete");
             },
             postUpdate: function () {
                 this.$.cmdSave.hidden = true;
