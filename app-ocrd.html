@@ -60,15 +60,15 @@
             }
         </style>
             <paper-tabs bottom selected="{{ coredetail_selected }}" selectedindex="0" id="paper_tabs">
-             <paper-tab id="paper_tab" active>Generales</paper-tab>
-             <paper-tab id="paper_tab1">Direcciones</paper-tab>
+             <paper-tab id="paper_tab" active>General</paper-tab>
+             <paper-tab id="paper_tab1">Address</paper-tab>
            </paper-tabs>
              <core-animated-pages  class="dataCard" selected="{{ coredetail_selected }}" hero-id="div" cross-fade hero?="{{true}}"  hero-p selectedindex="0" notap id="Core-animated-detail" transitions="cross-fade-all hero-transition" >
             <section>
                 <div id="div"  active vertical layout  >
                   
-                  <paper-input label="Codigo cliente" hero-id="cardcode" floatinglabel inputvalue="" value="{{ row.cardcode }}" id="txtCardcode" on-keyup="{{ keypressHandler }}" hero?={{true}} ></paper-input>
-                  <paper-input label="Razon social" floatinglabel inputvalue="" hero-id="cardname" hero?={{true}} value="{{ row.cardname }}" id="paper_input1" on-keyup="{{ keypressHandler }}" hero-id="cardname" ></paper-input>
+                  <paper-input label="Code" hero-id="cardcode" floatinglabel inputvalue="" value="{{ row.cardcode }}" id="txtCardcode" on-keyup="{{ keypressHandler }}" hero?={{true}} ></paper-input>
+                  <paper-input label="Name" floatinglabel inputvalue="" hero-id="cardname" hero?={{true}} value="{{ row.cardname }}" id="paper_input1" on-keyup="{{ keypressHandler }}" hero-id="cardname" ></paper-input>
                   <paper-radio-group selected="{{ row.cardtype }}" selectedindex="0" id="paper_radio_group" layout vertical >
                       <paper-radio-button  label="Customer" id="paper_radio_button" name="Customer" on-click="{{ keypressHandler }}"></paper-radio-button>
                       <paper-radio-button  label="Supplier" id="paper_radio_button1" name="Supplier" on-click="{{ keypressHandler }}"></paper-radio-button>

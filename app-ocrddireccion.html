@@ -32,18 +32,18 @@
         </style>
                
          <paper-tabs selected="{{selected }}" on-click={{clickTab}} selectedindex="0" id="paper_tabs">
-             <paper-tab id="paper_tab" active>Direccion</paper-tab>
+             <paper-tab id="paper_tab" active>Address</paper-tab>
              <paper-tab id="paper_tab1" on-click={{clickTab}}>Map</paper-tab>
            </paper-tabs>
            <core-animated-pages  class="dataCard" selected="{{ selected }}" hero-id="div" cross-fade hero?="{{true}}"  hero-p selectedindex="0" notap id="Core-animated-detail" transitions="cross-fade-all hero-transition" >
             <section>            
                    
-                <paper-input label="Nombre Direccion"  floatinglabel inputvalue="" value="{{ direction.address}}" on-keyup="{{ keypressHandler }}"  ></paper-input>
-                <paper-input label="Calle"  floatinglabel inputvalue="" value="{{ direction.street}}" on-keyup="{{ keypressHandler }}"  ></paper-input>
-                <paper-input label="Codigo Postal"  floatinglabel inputvalue="" value="{{ direction.zip}}" on-keyup="{{ keypressHandler }}"  ></paper-input>
-                <paper-input label="Ciudad"  floatinglabel inputvalue="" value="{{ direction.city}}" on-keyup="{{ keypressHandler }}"  ></paper-input>
-                <paper-input label="Provincia"  floatinglabel inputvalue="" value="{{ direction.state}}" on-keyup="{{ keypressHandler }}"  ></paper-input>
-                <paper-input label="País"  floatinglabel inputvalue="" value="{{ direction.country}}" on-keyup="{{ keypressHandler }}"  ></paper-input>          
+                <paper-input label="Name"  floatinglabel inputvalue="" value="{{ direction.address}}" on-keyup="{{ keypressHandler }}"  ></paper-input>
+                <paper-input label="Street"  floatinglabel inputvalue="" value="{{ direction.street}}" on-keyup="{{ keypressHandler }}"  ></paper-input>
+                <paper-input label="Zip Code"  floatinglabel inputvalue="" value="{{ direction.zip}}" on-keyup="{{ keypressHandler }}"  ></paper-input>
+                <paper-input label="City"  floatinglabel inputvalue="" value="{{ direction.city}}" on-keyup="{{ keypressHandler }}"  ></paper-input>
+                <paper-input label="State"  floatinglabel inputvalue="" value="{{ direction.state}}" on-keyup="{{ keypressHandler }}"  ></paper-input>
+                <paper-input label="Country"  floatinglabel inputvalue="" value="{{ direction.country}}" on-keyup="{{ keypressHandler }}"  ></paper-input>          
                 <paper-fab icon="arrow-back" hero-id="boton" class="mini" id="cmdBack" on-click="{{dataBack}}" ></paper-fab>     
                  <paper-fab icon="save" class="mini" id="cmdSave" hidden on-click="{{save}}" ></paper-fab>
             </section> 
