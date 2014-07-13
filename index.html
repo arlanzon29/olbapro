@@ -22,12 +22,12 @@
     <link rel="import" href="components/core-icons/core-icons.html">
     <link rel="import" href="components/core-ajax/core-ajax.html">
     <link rel="import" href="components/core-localstorage/core-localstorage.html">
-     <link rel="import" href="components/google-map/google-map.html">
-      <link rel="import" href="components/google-map/google-map-search.html">
+    <link rel="import" href="components/google-map/google-map.html">
+    <link rel="import" href="components/google-map/google-map-search.html">
     <link rel="import" href="components/core-header-panel/core-header-panel.html">
-<link rel="import" href="components/core-toolbar/core-toolbar.html">
-     <link rel="import" href="components/core-icon-button/core-icon-button.html">
-     <link rel="import" href="components/paper-shadow/paper-shadow.html">
+    <link rel="import" href="components/core-toolbar/core-toolbar.html">
+    <link rel="import" href="components/core-icon-button/core-icon-button.html">
+    <link rel="import" href="components/paper-shadow/paper-shadow.html">
 
     <link rel="import" href="components/paper-tabs/paper-tabs.html">
     <link rel="import" href="components/paper-tabs/paper-tab.html">
@@ -83,13 +83,13 @@
     <core-localstorage id="username" name="user" value="{{user}}"></core-localstorage>
     <core-localstorage id="password" name="password" value="{{password}}"></core-localstorage>
 
-    <olbapro-datasheet tableName="OCRD" keyColumn="cardcode"  appsScriptID="AKfycbzCNQNo5hxEe6BoqCOGdCmqggkEdL6eZAskEffrxeysBGIO32A" id="olbapro_datasheet" on-postupdate="{{postCommit}}" on-postinsert="{{postCommit}}" on-postdelete="{{postDelete}}" rows="{{rowsOcrd}}" user="{{user}}" password="{{password}}">
+    <olbapro-datasheet tableName="OCRD" keyColumn="cardcode"  appsScriptID="AKfycbzCNQNo5hxEe6BoqCOGdCmqggkEdL6eZAskEffrxeysBGIO32A" id="olbapro_datasheet" on-postupdate="{{postCommit}}" on-postinsert="{{postCommit}}" on-postdelete="{{postDelete}}" rows="{{rowsOcrd}}" user="{{user}}" password="{{password}}" on-postlogin="{{postLogin}}">
         <olbapro-datasheetdetail tableName="OCRD_DIRECCIONES" id="ocrd_direcciones" keyColumn="address"  on-postupdate="{{postCommitDetail}}" on-postinsert="{{postCommitDetail}}" ></olbapro-datasheetdetail>
     </olbapro-datasheet>
 
     <core-animated-pages  selected="{{core_selected}}" selectedindex="0" notap id="core_animated_pages" >
         <section class="seccion">
-          <app-login user="{{user}}" password="{{password}}" on-login="{{login}}"></app-login>
+          <app-login user="{{user}}" password="{{password}}" on-login="{{clickLogin}}"></app-login>
         </section>
     
          <section>
@@ -113,8 +113,11 @@
             this.user="manager";
             this.password="secure";
           },
-          login:function(){
-              this.$.core_animated_pages.selected = 1;
+          clickLogin:function(){
+            this.$.olbapro_datasheet.login();            
+          },
+          postLogin:function(){
+            this.$.core_animated_pages.selected = 1;
           },
           tapOcrdList: function () {
               this.$.olbapro_datasheet.position = this.$.listocrd.selected;

@@ -10,6 +10,8 @@
             url="https://script.google.com/macros/s/{{appsScriptID}}/exec?user={{user}}&password={{password}}" handleAs="json" method="POST" body="{{updateData}}" on-core-response="{{handleResponse}}"></core-ajax>
         <core-ajax id="deleteAjax"
             url="https://script.google.com/macros/s/{{appsScriptID}}/exec?user={{user}}&password={{password}}" handleAs="json" method="POST" body="{{deleteData}}" on-core-response="{{handleResponseDelete}}"></core-ajax>
+        <core-ajax id="loginAjax"
+            url="https://script.google.com/macros/s/{{appsScriptID}}/exec?method=login&user={{user}}&password={{password}}" handleAs="json" method="GET"   on-core-response="{{loginResponse}}"></core-ajax>
        
       </template>
       <script>
@@ -29,6 +31,9 @@
                       this.currentRow = JSON.parse(JSON.stringify(this.rows[this.position]));                      
                   }
 
+              },
+              login:function(){
+                this.$.loginAjax.go();
               },
               updateCurrentRow: function () {
                   var newValues = {};
@@ -104,7 +109,16 @@
                       alert(response.detail.response.lastError);
                   }
 
-              }
+              },
+              loginResponse: function (response) {
+                  if (response.detail.response.lastError == null) {
+                    this.fire("postlogin");
+                     
+                  } else {
+                      alert(response.detail.response.lastError);
+                  }
+
+              },
            
           });
        </script>
