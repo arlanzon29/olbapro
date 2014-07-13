@@ -1,4 +1,4 @@
 olbapro
 =======
 
-Polymer test app usign google apps sccript
+Create a mobile Polymer web application usign google spread sheet as data source.
