@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta http-equiv="Content-Type" content="text/html; charset= ISO-8859-1" />
+
+  <!-- 1. Load platform.js for polyfill support. -->
+  <script src="components/platform/platform.js"></script>
+  <!-- 2. Use an HTML Import to bring in the element. -->
+
+
+  <!-- 2. Use an HTML Import to bring in the element. -->
+  <link rel="import" href="components/polymer/polymer.html">
+  
+  <link rel="import" href="components/core-animated-pages/core-animated-pages.html">
+  <link rel="import" href="components/paper-button/paper-button.html">
+  <link rel="import" href="components/geo-location/geo-location.html">
+  <link rel="import" href="components/paper-input/paper-input.html">
+<link rel="import" href="components/firebase-element/firebase-element.html">
+  <style>
+  body {
+    margin: 0;
+    font-family: Tahoma;
+    
+  }
+  </style>
+
+</head>
+
+<body>
+  <polymer-element name="car-element">
+
+  <template>
+    <style>
+
+
+    :host {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+    }
+
+    #core_animated_pages
+    {
+      position: absolute;
+      width: 100%; /*  360px*/
+      height: 100%; /* 382px */
+      overflow: hidden;
+      background-color: rgb(238, 238, 238);
+    }
+
+
+
+    </style>
+    <geo-location on-geo-response="{{geoResponse}}" id="geo_location"></geo-location>
+    <firebase-element id="lat1" on-data-change="{{dataChange1}}"  location="https://blazing-fire-9906.firebaseio.com/appCar/car1" data="{{car1}}"   ></firebase-element>
+
+    <firebase-element id="lat2" on-data-change="{{dataChange2}}"  location="https://blazing-fire-9906.firebaseio.com/appCar/car2" data="{{car2}}"   ></firebase-element>
+
+    <core-animated-pages  selected="{{core_selected}}" selectedindex="0" notap id="core_animated_pages" >
+      <section class="seccion" id="sectionSelectCar" layout >
+        Select you car
+        <paper-button raisedButton label="Car 1" on-click="{{selectCar1}}"></paper-button>
+        <paper-button raisedButton label="Car 2" on-click="{{selectCar2}}"></paper-button>
+      </section>
+      <section class="seccion" id="sectionSelectCar">
+        <p>Controlling car {{car}}</p><br>
+        <p>Coche 1</p>
+          <paper-input label="Latitude" value="{{car1.latitude}}" floatinglabel></paper-input>
+          <paper-input label="Longitude" value="{{car1.longitude}}" floatinglabel></paper-input>
+          <paper-input label="Force" value="{{car1.forceUpdate}}" id="force1" floatinglabel></paper-input>
+        <p>Coche 2</p>
+          <paper-input label="Latitude" value="{{car2.latitude}}" floatinglabel></paper-input>
+          <paper-input label="Longitude" value="{{car2.longitude}}" floatinglabel></paper-input>
+          <paper-input label="Force" value="{{car2.forceUpdate}}" id="force2" floatinglabel></paper-input>
+        <p></p>
+        <paper-input label="Llamadas" value="{{llamadas}}" floatinglabel></paper-input>
+        <paper-button raisedButton label="Update location" on-click="{{updateLocation}}"></paper-button>
+      </section>
+
+    </core-animated-pages>
+</template>
+
+
+<script>
+Polymer('car-element', {
+  car:0,
+  llamadas:0,
+  ready: function () {
+    
+  },
+  selectCar1:function(){
+    this.car=1;
+    this.$.geo_location.ready();
+  
+
+    this.$.core_animated_pages.selected = 1;
+  },
+  selectCar2:function(){
+    this.car=2;
+    this.$.geo_location.ready();
+    this.$.core_animated_pages.selected = 1;
+  },
+  geoResponse:function(){
+    if (this.car==1){
+      this.car1.latitude=this.$.geo_location.latitude;
+      this.car1.longitude=this.$.geo_location.longitude;
+      this.car1.forceUpdate=0;
+    }else if (this.car==2){
+      this.car2.latitude=this.$.geo_location.latitude;
+      this.car2.longitude=this.$.geo_location.longitude;
+      this.car2.forceUpdate=0;
+    }
+    this.llamadas++;
+  }
+  ,
+    dataChange:function(){
+      alert("change")
+    },
+    updateLocation:function(){
+       this.$.geo_location.ready();
+
+       if (this.car==1){
+        this.car2.forceUpdate=1;
+       }else{
+        this.car1.forceUpdate=1;
+       }
+    },
+    dataChange1:function(){
+      if (this.car==1){
+        if (this.car1.forceUpdate==1){            
+           this.$.geo_location.ready();
+     
+        }
+      }
+     
+    },
+    dataChange2:function(){
+       if (this.car==2){
+          if (this.car2.forceUpdate==1){
+           this.$.geo_location.ready();           
+        }
+      }
+    }
+});
+
+</script>
+
+</polymer-element>
+<car-element></car-element>
+
+
+</body>
+</html>
