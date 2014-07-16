@@ -18,7 +18,7 @@
   <link rel="import" href="components/geo-location/geo-location.html">
   <link rel="import" href="components/paper-input/paper-input.html">
   <link rel="import" href="components/firebase-element/firebase-element.html">
-
+  <link rel="import" href="components/firebase-element/firebase-login.html">
   <link rel="import" href="components/paper-tabs/paper-tabs.html">
   <link rel="import" href="components/paper-tabs/paper-tab.html">
   <link rel="import" href="components/google-map/google-map.html">
@@ -83,15 +83,20 @@
 
     </style>
     <geo-location on-geo-response="{{geoResponse}}" id="geo_location"></geo-location>
+    <firebase-login id="login" on-login="{{loginCorrecto}}" location="https://blazing-fire-9906.firebaseio.com" provider="facebook"></firebase-login>
+
     <firebase-element id="lat1" on-data-change="{{dataChange1}}"  location="https://blazing-fire-9906.firebaseio.com/appCar/car1" data="{{car1}}"   ></firebase-element>
 
     <firebase-element id="lat2" on-data-change="{{dataChange2}}"  location="https://blazing-fire-9906.firebaseio.com/appCar/car2" data="{{car2}}"   ></firebase-element>
 
     <core-animated-pages  selected="{{core_selected}}" selectedindex="0" notap id="core_animated_pages" >
       <section class="seccion" id="sectionSelectCar" layout >
+        <paper-button raisedButton label="Conectar Facebook"  on-click="{{connectFacebook}}"></paper-button><br>
+
         Select you car
-        <paper-button raisedButton label="Car 1" on-click="{{selectCar1}}"></paper-button>
-        <paper-button raisedButton label="Car 2" on-click="{{selectCar2}}"></paper-button>
+        <paper-button raisedButton label="Car 1" disabled on-click="{{selectCar1}}" id="btnCard1"></paper-button>
+        <paper-button raisedButton label="Car 2" disabled on-click="{{selectCar2}}" id="btnCard2"></paper-button>
+    
       </section>
       <div class="seccion" id="sectionSelectCar" overflow="scroll">
         <paper-tabs selected="{{selected }}" on-click={{clickTab}} selectedindex="0" id="paper_tabs">
@@ -100,7 +105,7 @@
         </paper-tabs>
         <core-animated-pages  class="dataCard" selected="{{ selected }}">
           <div>
-            <p>Controlling car {{car}}</p><br>
+            <p>Controlling car {{car}}, User {{user}}</p><br>
             <p>Coche 1</p>
               <paper-input label="Latitude" value="{{car1.latitude}}" floatinglabel></paper-input>
               <paper-input label="Longitude" value="{{car1.longitude}}" floatinglabel></paper-input>
@@ -111,11 +116,12 @@
               <paper-input label="Force" value="{{car2.forceUpdate}}" id="force2" floatinglabel></paper-input>
             <p></p>
             <paper-input label="Llamadas" value="{{llamadas}}" floatinglabel></paper-input>
+            <paper-input label="Distancia" value="{{distancia}}" floatinglabel></paper-input>
             <paper-button raisedButton label="Update location" on-click="{{updateLocation}}"></paper-button>
           </div>
           <div>
 
-            <google-map latitude="{{ car1.latitude }}" longitude="{{ car1.longitude}}"   zoom="18" id="map_how">
+            <google-map latitude="{{ car1.latitude }}" longitude="{{ car1.longitude}}" showCenterMarker   zoom="18" id="map_how">
               
                     
                   </google-map>
@@ -132,8 +138,18 @@
 Polymer('car-element', {
   car:0,
   llamadas:0,
+  user:"",
   ready: function () {
-    
+   
+  },
+  connectFacebook:function(){
+      this.$.login.login();
+  },
+  loginCorrecto:function(obj,facebook){
+      this.$.btnCard1.disabled=false;
+      this.$.btnCard2.disabled=false;
+      this.user=facebook.user.displayName;
+        
   },
   selectCar1:function(){
     this.car=1;
@@ -151,13 +167,16 @@ Polymer('car-element', {
     if (this.car==1){
       this.car1.latitude=this.$.geo_location.latitude;
       this.car1.longitude=this.$.geo_location.longitude;
+      this.car1.user=this.user;
       this.car1.forceUpdate=0;
     }else if (this.car==2){
       this.car2.latitude=this.$.geo_location.latitude;
       this.car2.longitude=this.$.geo_location.longitude;
+      this.car2.user=this.user;
       this.car2.forceUpdate=0;
     }
     this.llamadas++;
+    this.calcularDistancia();
   }
   ,
     dataChange:function(){
@@ -188,8 +207,13 @@ Polymer('car-element', {
         }
       }
     },
+    calcularDistancia:function(){
+      this.distancia=distance(this.car1.latitude,this.car1.longitude,this.car2.latitude,this.car2.longitude,"K");
+    },
     clickTab:function(){
+      this.$.map_how.zoom=18;
          this.$.map_how.resize();
+         this.$.map_how.zoom=18;
     }
 });
 
@@ -197,7 +221,39 @@ Polymer('car-element', {
 
 </polymer-element>
 <car-element></car-element>
+<script type="text/javascript">
+function distance(lat1, lon1, lat2, lon2, unit) {
 
+    var radlat1 = Math.PI * lat1/180
+
+    var radlat2 = Math.PI * lat2/180
+
+    var radlon1 = Math.PI * lon1/180
+
+    var radlon2 = Math.PI * lon2/180
+
+    var theta = lon1-lon2
+
+    var radtheta = Math.PI * theta/180
+
+    var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+
+    dist = Math.acos(dist)
+
+    dist = dist * 180/Math.PI
+
+    dist = dist * 60 * 1.1515
+
+    if (unit=="K") { dist = dist * 1.609344 }
+
+    if (unit=="N") { dist = dist * 0.8684 }
+
+    return dist
+
+}
+
+
+</script>
 
 </body>
 </html>
