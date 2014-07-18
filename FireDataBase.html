@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta http-equiv="Content-Type" content="text/html; charset= ISO-8859-1" />
+
+  <!-- 1. Load platform.js for polyfill support. -->
+  <script src="components/platform/platform.js"></script>
+  <!-- 2. Use an HTML Import to bring in the element. -->
+
+
+  <!-- 2. Use an HTML Import to bring in the element. -->
+  <link rel="import" href="components/polymer/polymer.html">
+  
+    <link rel="import" href="components/paper-input/paper-input.html">
+      <link rel="import" href="components/firebase-element/firebase-element.html">
+  <link rel="import" href="components/firebase-element/firebase-login.html">
+    <link rel="import" href="components/paper-button/paper-button.html">
+  <style>
+  body {
+    margin: 0;
+    font-family: Tahoma;
+    
+  }
+  </style>
+
+</head>
+
+<body>
+  <polymer-element name="car-element">
+
+  <template>
+    <style>
+
+
+    :host {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+    }
+
+
+
+    </style>
+     <firebase-login id="login" location="https://blazing-fire-9906.firebaseio.com" provider="facebook"></firebase-login>
+
+      <firebase-element id="lista" on-data-change="{{dataChange}}"   location="https://blazing-fire-9906.firebaseio.com/olbapro/OCRD/Rows" data="{{filas}}"   ></firebase-element>
+
+      <firebase-element id="elemento"  location=""   data="{{fila}}"   ></firebase-element>
+
+      <paper-button raisedButton label="Anterior"  on-click="{{anterior}}" ></paper-button>
+        <paper-button raisedButton label="Posterior"  on-click="{{posterior}}" ></paper-button>
+            <paper-button raisedButton label="Nuevo"  on-click="{{new}}" ></paper-button>
+<br>
+      <paper-input label="Código Cliente" value="{{fila.CardCode}}" floatinglabel></paper-input>
+      <paper-input label="Código Cliente" value="{{fila.CardName}}" floatinglabel></paper-input>
+   
+    <paper-button raisedButton label="Add"  on-click="{{add}}" ></paper-button>
+
+</template>
+
+
+<script>
+Polymer('car-element', {
+  row:0,
+  objKeys:[], 
+  ready: function () {
+    fila={"CardCode":"","CardName":""}
+   
+  },
+  anterior:function(){
+    if (this.row>0){
+      this.row-=1;
+      this.changeRow();
+    }
+
+  },
+  posterior:function(){
+    if (this.row<this.objKeys.length-1){
+      this.row+=1;
+      this.changeRow();
+    }
+  },
+  dataChange:function(){
+    if (this.filas==null){
+      this.row=-1;
+      this.objKeys=[];
+      this.fila={"CardCode":"","CardName":""}
+    }
+    else{
+      this.row=0;
+      this.objKeys=Object.keys(this.filas)
+      this.changeRow();
+    }
+  },
+  changeRow:function(){
+    var fila=this.objKeys[this.row];
+    this.$.elemento.location="https://blazing-fire-9906.firebaseio.com/olbapro/OCRD/Rows/"+fila;
+  },
+  add:function(){
+    this.$.lista.push(this.fila);
+  }
+  ,
+  new:function(){
+    this.$.elemento.location="";
+     this.row=-1;
+      this.fila={"CardCode":"","CardName":""}
+  }
+
+});
+
+</script>
+
+</polymer-element>
+<car-element></car-element>
+
+
+</body>
+</html>
