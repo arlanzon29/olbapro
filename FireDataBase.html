@@ -64,7 +64,7 @@
 
 <script>
 Polymer('car-element', {
-  row:0,
+  row:-1,
   objKeys:[], 
   ready: function () {
     fila={"CardCode":"","CardName":""}
@@ -90,9 +90,12 @@ Polymer('car-element', {
       this.fila={"CardCode":"","CardName":""}
     }
     else{
-      this.row=0;
-      this.objKeys=Object.keys(this.filas)
-      this.changeRow();
+        this.objKeys=Object.keys(this.filas);
+
+      if (this.row==-1){
+        this.row=0;
+        this.changeRow();
+      }
     }
   },
   changeRow:function(){
