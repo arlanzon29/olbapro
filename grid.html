@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta http-equiv="Content-Type" content="text/html; charset= ISO-8859-1" />
+
+    <!-- 1. Load platform.js for polyfill support. -->
+    <script src="components/platform/platform.js"></script>
+   
+    <!-- 2. Use an HTML Import to bring in the element. -->
+    <link rel="import" href="components/polymer/polymer.html">
+    <link rel="import" href="components/olbapro-datasheet/olbapro-datasheet.html">
+
+    <link rel="import" href="components/paper-input/paper-input.html">
+   
+    <style>
+        body {
+            margin: 0;
+            font-family: Tahoma;
+    
+        }
+    </style>
+   
+</head>
+   
+<body>
+    <polymer-element name="olbapro-grid" attributes="rows">
+
+  <template>
+    <style>
+       
+
+      :host {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+         margin: 0;
+      }
+
+      .cell {
+          border: 1px solid black;
+          background-color:lightblue;
+          font-family: Tahoma;
+          width: 100px;
+          font-size: 14px;
+
+      }
+
+      .header {
+        border: 1px solid black;
+        font-family: Tahoma;
+        width: 100px;
+        display:block;
+        font-size: 14px;
+        background-color:orange;
+      }
+
+             
+    </style>
+    <div id="headerDiv" horizontal layout></div>
+    <div id="mydiv" >
+
+    </div> 
+  </template>
+
+
+  <script>
+      Polymer('olbapro-grid', {
+          rows:1,
+          columnsName:[],
+          lastRowPainted:-1,
+          data:[],
+          firstRow:0,
+          insertAllowed:true,
+          ready: function () {
+            var columns=this.children[0];
+            for (var i=0;i<columns.children.length;i++){
+              this.columnsName.push(columns.children[i].id);
+               var span=this.$.headerDiv.appendChild(document.createElement("span"));
+               span.innerHTML =columns.children[i].label;
+               span.className="header";             
+
+               var width=columns.children[i].style.width;
+
+               if (width!=""){
+                span.style.width=width;
+               }
+               span.style.height="30px";
+            }
+
+
+            for (var j=0;j<this.rows;j++){
+              var row=this.$.mydiv.appendChild(document.createElement("div"));
+              row.id="row"+pad(j,3);
+              row.style.height="30px";
+               for (var i=0;i<columns.children.length;i++){
+                  var obj = columns.children[i].cloneNode(true);
+                  obj.id=columns.children[i].id+pad(j,3);
+                  obj.label="";
+                  obj.className="cell";
+                  obj.style.height="30px";
+                  obj.onkeydown=function(event){this.offsetParent.keyDown(event)};
+                  obj.onfocus=function(event){this.offsetParent.focus(event)};
+                  obj.onblur=function(event){this.offsetParent.blur(event)};
+
+                  row.appendChild(obj);
+               }             
+            }
+
+            
+
+            this.data=[
+                  {"code":"C01","name":"Mi primer Codigo","type":"Supplier"},
+                  {"code":"C02","name":"Mi segundo Codigo","type":"Supplier"},
+                  {"code":"C03","name":"Mi tercer Codigo","type":"Supplier"},
+                  {"code":"C04","name":"Mi cuarto Codigo","type":"Supplier"},
+                  {"code":"C05","name":"Mi quinto Codigo","type":"Customer"},
+                  {"code":"C06","name":"Mi sexto Codigo","type":"Supplier"},
+                  {"code":"C07","name":"Mi septimo Codigo","type":"Customer"},
+                  {"code":"C08","name":"Mi octavo Codigo","type":"Customer"},
+                ];
+            this.refreshData();
+           
+          },
+          keyDown:function(event){
+            if (event.keyCode=="40"){
+              var pos=parseInt(right(event.currentTarget.id,3));
+              var colum=left(event.currentTarget.id,event.currentTarget.id.length-3)
+
+             if (pos<this.rows-1){
+              this.shadowRoot.querySelector("#"+colum+pad(pos+1,3)).$.input.focus();
+             }else{
+              if (!this.insertAllowed){
+                if (this.firstRow<this.data.length-this.rows){
+                  this.firstRow+=1;
+                  this.refreshData();
+                }
+              }else{
+                 if (this.firstRow<this.data.length-this.rows+1){
+                  this.firstRow+=1;
+                  this.refreshData();
+                }
+              }
+             }
+            }else if (event.keyCode=="38"){
+              var pos=parseInt(right(event.currentTarget.id,3));
+              var colum=left(event.currentTarget.id,event.currentTarget.id.length-3)
+
+             if (pos>0){
+              this.shadowRoot.querySelector("#"+colum+pad(pos-1,3)).$.input.focus();
+             }else{
+              if (this.firstRow>0){
+                this.firstRow-=1;
+                this.refreshData();
+              }
+             }
+            }
+          },
+          focus:function(event){
+            var pos=parseInt(right(event.currentTarget.id,3));
+            if (this.lastRowPainted!=pos){
+              for (var i=0;i<this.columnsName.length;i++){
+                  this.shadowRoot.querySelector("#"+this.columnsName[i]+pad(pos,3)).style.background="red";
+                  if (this.lastRowPainted!=-1){
+                    this.shadowRoot.querySelector("#"+this.columnsName[i]+pad(this.lastRowPainted,3)).style.background="lightblue";
+                  }                  
+              }
+
+              this.lastRowPainted=pos;
+            }
+          },
+          refreshData:function(){
+            for (var i=0;i<this.data.length-this.firstRow && i<this.rows;i++){
+              var ele=this.data[this.firstRow+i];
+              for(var propertyName in ele) {
+                this.shadowRoot.querySelector("#"+propertyName+pad(i,3)).value=ele[propertyName];
+              }             
+            }
+            for (var i=this.data.length-this.firstRow; i<this.rows;i++){
+              for(var j=0;j<this.columnsName.length;j++) {
+                this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(i,3)).value="";
+              }             
+            }
+          },
+          blur:function(event){
+            var pos=parseInt(right(event.currentTarget.id,3));
+            var colum=left(event.currentTarget.id,event.currentTarget.id.length-3)
+            var value=this.shadowRoot.querySelector("#"+event.currentTarget.id).value
+
+            if (value!=this.data[this.firstRow+pos][colum]){
+               this.data[this.firstRow+pos][colum]=value;
+               this.data[this.firstRow+pos].status="U";
+            }
+           
+
+          }
+      });
+
+  </script>
+
+</polymer-element>
+  <olbapro-grid rows="7">
+    <columns>
+      <paper-input id="code" label="Code" class="prueba" style="width:80px"></paper-input>
+      <paper-input id="name" label="Name" style="width: 400px"></paper-input>
+      <paper-input id="type" label="Type" style="width: 120px"></paper-input>
+    </columns>
+  </olbapro-grid> 
+
+  <script>
+  function pad(n, width, z) {
+    z = z || '0';
+    n = n + '';
+    return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+  }
+
+function left(str, n)
+{
+    if (n <= 0)
+        return "";  
+    else if (n > String(str).length)
+        return str;
+    else
+        return String(str).substring(0,n);
+}
+
+  function right(str, n)
+  {
+      if (n <= 0)
+          return "";
+      else if (n > String(str).length)
+          return str;
+      else
+      {
+          var iLen = String(str).length;
+          return String(str).substring(iLen, iLen - n);
+      }
+  }
+</script>
+</body>
+</html>
