@@ -190,9 +190,22 @@
             var colum=left(event.currentTarget.id,event.currentTarget.id.length-3)
             var value=this.shadowRoot.querySelector("#"+event.currentTarget.id).value
 
-            if (value!=this.data[this.firstRow+pos][colum]){
-               this.data[this.firstRow+pos][colum]=value;
-               this.data[this.firstRow+pos].status="U";
+            if (this.firstRow+pos<this.data.length){
+              if (value!=this.data[this.firstRow+pos][colum]){
+                 this.data[this.firstRow+pos][colum]=value;
+                 this.data[this.firstRow+pos].status="U";
+              }
+            }else{
+              if (value!=""){
+                var newObj={};
+                 for(var j=0;j<this.columnsName.length;j++) {
+                  newObj[this.columnsName[j]]="";
+                } 
+
+                this.data.push(newObj);
+                this.data[this.firstRow+pos][colum]=value;
+                this.data[this.firstRow+pos].status="I";
+              }
             }
            
 
