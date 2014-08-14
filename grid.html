@@ -15,6 +15,7 @@
 
     <link rel="import" href="components/paper-input/paper-input.html">
     <link rel="import" href="components/paper-button/paper-button.html">
+        <link rel="import" href="components/paper-slider/paper-slider.html">
    <link rel="import" href="components/olbapro-grid/olbapro-grid.html">
     <style>
         body {
@@ -34,9 +35,9 @@
       </style>
       <olbapro-grid id="grid" rows="7" insertAllowed="true" on-validatecell="{{validateCell}}" data="{{dataGrid}}">
         <columns>
-          <paper-input id="code" label="Code"  style="width:80px" updatenotallowed ></paper-input>
-          <paper-input id="name" label="Name" style="width: 400px"></paper-input>
-          <paper-input id="type" label="Type" style="width: 120px"></paper-input>
+          <paper-input id="code" label="Code"  style="width:60px" updatenotallowed ></paper-input>
+          <paper-input id="name" label="Name" style="width:150px"></paper-input>
+          <paper-input id="type" label="Type" style="width:100px"></paper-input>
         </columns>
       </olbapro-grid> 
       
@@ -52,6 +53,8 @@
                   {"code":"C06","name":"Mi sexto Codigo","type":"Supplier"},
                   {"code":"C07","name":"Mi septimo Codigo","type":"Customer"},
                   {"code":"C08","name":"Mi octavo Codigo","type":"Customer"},
+                  {"code":"C09","name":"Mi noveno Codigo","type":"Customer"},
+                  {"code":"C10","name":"Mi decimo Codigo","type":"Customer"},
                 ],
         ready: function () {         
 

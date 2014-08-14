@@ -44,10 +44,12 @@
 
 
   </style>
+
   <div id="headerDiv" horizontal layout></div>
-  <div id="mydiv" >
+  <div id="mydiv" style="border:1px solid">
 
   </div> 
+  <paper-slider id="slider" min="1" max="{{maxSlider}}" value="1" on-change="{{changeSlider}}"></paper-slider>
 </template>
 
 
@@ -59,6 +61,7 @@ Polymer('olbapro-grid', {
   data:[],
   firstRow:0,
   insertAllowed:true,
+  maxSlider:5,
   ready: function () {
     var columns=this.children[0];
 
@@ -130,6 +133,12 @@ Polymer('olbapro-grid', {
     }
 
 
+    if (this.insertAllowed){
+      this.maxSlider=this.data.length-this.rows+2;
+    }else{
+      this.maxSlider=this.data.length-this.rows+1;
+    }
+    
     this.refreshData();
 
   },
@@ -293,6 +302,13 @@ setFirstRow:function(value){
     return true;
   }else{
     return false;
+  }
+},
+changeSlider:function(){
+  if (this.setFirstRow(this.$.slider.value-1)){
+    this.refreshData();
+  }else{
+
   }
 }
 });
