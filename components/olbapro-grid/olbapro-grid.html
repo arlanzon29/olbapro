@@ -1,5 +1,5 @@
 
-<polymer-element name="olbapro-grid" attributes="rows insertAllowed data">
+<polymer-element name="olbapro-grid" attributes="rows insertAllowed readonly selectionmode data">
 
 <template>
   <style>
@@ -8,45 +8,58 @@
   :host {
     position: absolute;
     
-   
+
     box-sizing: border-box;
     margin: 0;
   }
 
   .cell {
-    border: 1px solid black;
+    border-left: 1px solid black;
     background-color:lightblue;
     font-family: Tahoma;
     width: 100px;
     font-size: 14px;
 
-
+ padding-left:5px; 
   }
 
   .cellPosition {
-    border: 1px solid black;
     background-color:lightblue;
     font-family: Tahoma;
     width: 100px;
     font-size: 14px;
     text-align:right;
+    cursor: pointer;
+     padding-left:5px;
 
   }
 
   .header {
-    border: 1px solid black;
+    border-left: 1px solid black;
     font-family: Tahoma;
     width: 100px;
     display:block;
     font-size: 14px;
-    background-color:orange;
+    font-weight: bold;
+    background-color:RoyalBlue  ;
+    color:white;
+    text-align: left;
+    padding-left:5px; 
+  }
+
+  .gridDiv{
+    border: 1px solid black;
+  }
+  .gridHeader{
+    border-top: 1px solid black;
+    border-right: 1px solid black;
   }
 
 
   </style>
 
-  <div id="headerDiv" horizontal layout></div>
-  <div id="mydiv" >
+  <div id="headerDiv" class="gridHeader" horizontal layout></div>
+  <div id="mydiv" class="gridDiv" >
 
   </div> 
   <paper-slider id="slider" min="1" max="{{maxSlider}}" value="1" on-change="{{changeSlider}}"></paper-slider>
@@ -59,9 +72,13 @@ Polymer('olbapro-grid', {
   columnsName:[],
   lastRowPainted:-1,
   data:[],
+  selectedRows:[],
   firstRow:0,
-  insertAllowed:true,
+  selectionmode:"none",
+  insertAllowed:false,
+  readOnly:false,
   maxSlider:5,
+  lastSortColumn:"",
   ready: function () {
     var columns=this.children[0];
 
@@ -76,8 +93,11 @@ Polymer('olbapro-grid', {
       this.columnsName.push(columns.children[i].id);
 
       var span=this.$.headerDiv.appendChild(document.createElement("span"));
+      span.id="header"+columns.children[i].id;
       span.innerHTML =columns.children[i].label;
-      span.className="header";             
+      span.className="header";   
+      span.onclick=function(event){this.offsetParent.clickHeader(event)};
+          
 
       var width=columns.children[i].style.width;
 
@@ -99,13 +119,15 @@ Polymer('olbapro-grid', {
       span.style.width="24px";
       span.style.height="30px";
       span.disabled=true;
+      span.onclick=function(event){this.offsetParent.clickPosition(event)};
+
 
       for (var i=0;i<columns.children.length;i++){
         var obj=document.createElement("paper-input");
         obj.id=columns.children[i].id+pad(j,3);
         obj.label="";
         obj.className="cell";
-     
+
         var width=columns.children[i].style.width;
         if (columns.children[i].attributes.getNamedItem("updatenotallowed")==null){
           obj.updatenotallowed=false;
@@ -113,7 +135,7 @@ Polymer('olbapro-grid', {
           obj.updatenotallowed=true;
         }
 
-         if (columns.children[i].attributes.getNamedItem("insertnotallowed")==null){
+        if (columns.children[i].attributes.getNamedItem("insertnotallowed")==null){
           obj.insertnotallowed=false;
         }else{
           obj.insertnotallowed=true;
@@ -154,20 +176,24 @@ Polymer('olbapro-grid', {
       if (pos<this.rows-1){ /* if we are no on the last row */
         this.shadowRoot.querySelector("#"+colum+pad(pos+1,3)).$.input.focus(); /* Focus next line control */
       }else{ /* if we are on the las row */
-        if (!this.insertAllowed){  /* If we can not insert */
+        if (!this.insertAllowed || this.readonly){  /* If we can not insert */
           if (this.firstRow<this.data.length-this.rows){ /* there is more rows to show */
             if (this.setFirstRow(this.firstRow+1)){ /* try to change first row */
               this.refreshData();  /*Refresh data */
+              this.paintData();
+              this.$.slider.value=this.firstRow+1;
+
             }            
           }
         }else{ /* Insert allowed */
          if (this.firstRow==this.data.length-this.rows){ /* we are on de lastrow */
           this.shadowRoot.querySelector("#"+this.columnsName[0]+pad(pos,3)).$.input.focus(); /* focus on the prior line */
-          }
-          if (this.firstRow<this.data.length-this.rows+1){ /* if there is prior rows */
-           if (this.setFirstRow(this.firstRow+1)){ /* try to change first row */
-            this.refreshData(); /* Refresh Data */
-          }
+        }
+        if (this.firstRow<this.data.length-this.rows+1){ /* if there is prior rows */
+         if (this.setFirstRow(this.firstRow+1)){ /* try to change first row */
+          this.refreshData(); /* Refresh Data */
+          this.paintData();
+        }
       }              
     }
   }
@@ -182,6 +208,8 @@ Polymer('olbapro-grid', {
     if (this.firstRow>0){  /* if we are not on the first row */
       if (this.setFirstRow(this.firstRow-1)){ /* Change first row */
         this.refreshData(); /* Refresh Data */
+        this.paintData();
+        this.$.slider.value=this.firstRow+1;
       }
     }
   }
@@ -196,48 +224,54 @@ focus:function(event){
 
   var pos=parseInt(right(event.currentTarget.id,3));
   if (this.lastRowPainted!=pos){
-    for (var i=0;i<this.columnsName.length;i++){
-      if (!this.shadowRoot.querySelector("#"+this.columnsName[i]+pad(pos,3)).invalid){
-        this.shadowRoot.querySelector("#"+this.columnsName[i]+pad(pos,3)).style.background="lightgreen";
-      }
-
-      if (this.lastRowPainted!=-1){
-        if (!this.shadowRoot.querySelector("#"+this.columnsName[i]+pad(this.lastRowPainted,3)).invalid){
-          this.shadowRoot.querySelector("#"+this.columnsName[i]+pad(this.lastRowPainted,3)).style.background="lightblue";
-        }
-      }                  
-    }
-
+    var r= this.lastRowPainted;
     this.lastRowPainted=pos;
+
+    this.paintRow(pos);
+    this.paintRow(r);    
   }
 },
 refreshData:function(){
-
-  for (var i=0;i<this.data.length-this.firstRow && i<this.rows;i++){
-    var ele=this.data[this.firstRow+i];
-    for (var j=0;j<this.columnsName.length;j++){
-      var ctr=this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(i,3));
-      ctr.value=ele[this.columnsName[j]];
-      if (ctr.updatenotallowed){
-        ctr.readonly=true;
+  for (var i=0;i<this.rows;i++){
+    if (i+this.firstRow<this.data.length){
+      var ele=this.data[this.firstRow+i];
+      for (var j=0;j<this.columnsName.length;j++){
+        var ctr=this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(i,3));
+        ctr.value=ele[this.columnsName[j]];
+        ctr.disabled=false;
+        if (ctr.updatenotallowed || this.readonly){
+          ctr.readonly=true;
+        }else{
+          ctr.readonly=false;
+        }
+      }  
+      this.shadowRoot.querySelector("#pos"+pad(i,3)).value=this.firstRow+i+1;
+    }else if (i+this.firstRow<this.data.length){
+      for (var j=0;j<this.columnsName.length;j++){
+        var ctr=this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(i,3))
+        ctr.value="";       
+      }     
+    
+      if (this.insertAllowed && !this.readonly){
+        this.shadowRoot.querySelector("#pos"+pad(i,3)).value="*"; 
+        ctr.disabled=false;
       }else{
-        ctr.readonly=false;
-      }
-    }  
-    this.shadowRoot.querySelector("#pos"+pad(i,3)).value=this.firstRow+i+1;      
-  }
-
-  for (var i=this.data.length-this.firstRow; i<this.rows;i++){
-    for (var j=0;j<this.columnsName.length;j++){
-      var ctr=this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(i,3))
-      ctr.value="";
-      if (ctr.insertnotallowed){
+        var ctr=this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(i,3))
+        ctr.value="";
         ctr.readonly=true;
-      }else{
-        ctr.readonly=false;
+        ctr.disabled=true;
+        this.shadowRoot.querySelector("#pos"+pad(i,3)).value=""; 
       }
-    }    
-    this.shadowRoot.querySelector("#pos"+pad(i,3)).value="*";           
+
+    }else{
+      for (var j=0;j<this.columnsName.length;j++){
+        var ctr=this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(i,3))
+        ctr.value=""; 
+        ctr.readonly=true;      
+        ctr.disabled=true;
+      }      
+      this.shadowRoot.querySelector("#pos"+pad(i,3)).value=""; 
+    }
   }
 },
 blur:function(event){
@@ -307,9 +341,136 @@ setFirstRow:function(value){
 changeSlider:function(){
   if (this.setFirstRow(this.$.slider.value-1)){
     this.refreshData();
+    this.paintData();
   }else{
 
   }
+},
+dataChanged:function(){
+  this.setFirstRow(0);
+  this.refreshData();
+  /* Unselect all */
+  for (var i=0;i<this.data.length;i++){
+    this.selectedRows.push(false);
+  }
+
+  this.paintData();
+
+  if (this.insertAllowed){
+    this.maxSlider=this.data.length-this.rows+1;
+  }else{
+    this.maxSlider=this.data.length-this.rows;
+  }
+  this.$.slider.value=1;
+},
+clickPosition:function(event){
+  if (this.selectionmode!="none"){
+    var pos=parseInt(right(event.currentTarget.id,3));
+    if (pos+this.firstRow<this.data.length){
+      if (this.selectionmode=="multiple"){
+       this.selectedRows[pos+this.firstRow]=!this.selectedRows[pos+this.firstRow]; 
+     }else{ /*single */
+      for (var i=0;i<this.selectedRows.length;i++){
+        this.selectedRows[i]=false;
+      }
+      this.selectedRows[pos+this.firstRow]=true; 
+     }
+      
+
+      this.paintData();
+     if (this.selectedRows[pos+this.firstRow]){
+      var obj={"data":this.data[pos+this.firstRow],"position":pos+this.firstRow}
+         this.fire("selectedrow",obj);
+
+     }
+    }
+  }  
+},
+paintRow:function(row){
+  if (row+this.firstRow<this.data.length){
+    var selected=false;
+    if (this.selectedRows[row+this.firstRow]){
+      selected=true;
+    }
+
+
+    for (var j=0;j<this.columnsName.length;j++){     
+      if (selected) {
+        this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="orange";
+      }else{
+       if (this.lastRowPainted==row){
+        this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="lightgreen";
+       }else{
+        if ((this.firstRow+row)%2==1){
+this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="lightblue";
+        }else{
+          this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="white";
+        }
+        
+       }
+      }
+    }
+
+    if (selected){
+       this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="orange";
+    }else{
+      if (this.lastRowPainted==row){
+          this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="lightgreen";
+      }else{
+        if ((this.firstRow+row)%2==1){
+          this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="lightblue";
+        }else{
+          this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="white";
+        }
+        }
+    }
+  }else{
+    for (var j=0;j<this.columnsName.length;j++){
+      this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="white";
+   }
+    this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="white";
+  }
+ 
+},
+paintData:function(){
+  for (var i=0;i<this.rows;i++){
+    this.paintRow(i);
+  }
+},
+clickHeader:function(event){
+  var column=event.currentTarget.id.substring(6);
+
+  if (this.lastSortColumn==column){
+    this.data.reverse(this.sortFunction(column));
+    this.lastSortColumn="";
+
+  }else{
+    this.data.sort(this.sortFunction(column));
+    this.lastSortColumn=column;
+  }
+
+ 
+  for (var i=0;i<this.selectedRows.length;i++){
+    this.selectedRows[i]=false;
+  }
+  if (this.setFirstRow(0)){
+    this.refreshData();
+    this.paintData();
+  }
+
+},
+sortFunction:function(colum){
+  return function(a,b){
+      var v1=a[colum];
+      var v2=b[colum];
+      if (v1==v2){
+        return 0;
+      }else if (v1<v2){
+        return -1;
+      }else{
+        return 1;
+      }
+  };
 }
 });
 

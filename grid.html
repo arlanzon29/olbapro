@@ -33,7 +33,9 @@
       <style>        
         
       </style>
-      <olbapro-grid id="grid" rows="7" insertAllowed="true" on-validatecell="{{validateCell}}" data="{{dataGrid}}">
+      <paper-input label="Filter" id="Filter" value="{{filtervalue}}" on-change="{{validateFilter}}"></paper-input>
+<br>
+      <olbapro-grid id="grid" rows="7" insertAllowed="true" readonly="true" selectionmode="multiple" on-validatecell="{{validateCell}}" on-selectedrow="{{selectedrow}}" data="{{filterData}}">
         <columns>
           <paper-input id="code" label="Code"  style="width:60px" updatenotallowed ></paper-input>
           <paper-input id="name" label="Name" style="width:150px"></paper-input>
@@ -56,8 +58,10 @@
                   {"code":"C09","name":"Mi noveno Codigo","type":"Customer"},
                   {"code":"C10","name":"Mi decimo Codigo","type":"Customer"},
                 ],
+        filterData:[],
+        filtervalue:"",
         ready: function () {         
-
+          this.filterData=this.dataGrid;
            
         },
         validateCell:function(event,data){
@@ -68,12 +72,23 @@
         },
         checkGrid:function(){
           alert("check"+this.$.grid.invalid());
+        },
+        validateFilter:function(){
+          this.filterData=this.dataGrid.filter(function(element,index,arr,value){
+              if (element.code.indexOf(this)!=-1 || element.name.indexOf(this)!=-1 || element.type.indexOf(this)!=-1){
+                return true;
+              }else{
+                return false;
+              }
+          },this.filtervalue);
+        },
+        selectedrow:function(event,obj){
+          
         }
       });
     </script>
   </polymer-element>
-<paper-input label="Prueba"></paper-input>
-<br>
+
   <grid-test ></grid-test>
 
  
