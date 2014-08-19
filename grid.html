@@ -15,8 +15,9 @@
 
     <link rel="import" href="components/paper-input/paper-input.html">
     <link rel="import" href="components/paper-button/paper-button.html">
-        <link rel="import" href="components/paper-slider/paper-slider.html">
+    <link rel="import" href="components/paper-slider/paper-slider.html">
    <link rel="import" href="components/olbapro-grid/olbapro-grid.html">
+   <link rel="import" href="components/paper-checkbox/paper-checkbox.html">
     <style>
         body {
             margin: 0;
@@ -33,47 +34,68 @@
       <style>        
         
       </style>
-      <olbapro-grid id="grid" rows="7" insertAllowed="true" on-validatecell="{{validateCell}}" data="{{dataGrid}}">
-        <columns>
-          <paper-input id="code" label="Code"  style="width:60px" updatenotallowed ></paper-input>
-          <paper-input id="name" label="Name" style="width:150px"></paper-input>
-          <paper-input id="type" label="Type" style="width:100px"></paper-input>
-        </columns>
+      <paper-checkbox label="Insert Allowed" checked="{{insertallowed}}"></paper-checkbox>
+      <paper-checkbox label="Read only" checked="{{readonly}}"></paper-checkbox>
+      <br>
+      <br>
+      <paper-input label="Filter" id="Filter" value="{{filtervalue}}" on-change="{{validateFilter}}"></paper-input>
+<br>
+      <olbapro-grid id="grid" rows="7" insertAllowed="{{insertallowed}}" readonly="{{readonly}}" selectionmode="multiple" on-validatecell="{{validateCell}}" on-selectedrow="{{selectedrow}}" data="{{filterData}}">
+        <olbapro-columns>
+          <olbapro-column id="code" label="Code"  width="60px"  ></olbapro-column>
+          <olbapro-column id="name" label="Name" width="150px" updateallowed></olbapro-column>
+          <olbapro-column id="type" label="Type" width="100px" updateallowed></olbapro-column>
+        </olbapro-columns>
       </olbapro-grid> 
       
     </template>
     <script>
       Polymer('grid-test', {
         dataGrid:[
-                  {"code":"C01","name":"Mi primer Codigo","type":"Supplier"},
-                  {"code":"C02","name":"Mi segundo Codigo","type":"Supplier"},
-                  {"code":"C03","name":"Mi tercer Codigo","type":"Supplier"},
-                  {"code":"C04","name":"Mi cuarto Codigo","type":"Supplier"},
-                  {"code":"C05","name":"Mi quinto Codigo","type":"Customer"},
-                  {"code":"C06","name":"Mi sexto Codigo","type":"Supplier"},
-                  {"code":"C07","name":"Mi septimo Codigo","type":"Customer"},
-                  {"code":"C08","name":"Mi octavo Codigo","type":"Customer"},
-                  {"code":"C09","name":"Mi noveno Codigo","type":"Customer"},
-                  {"code":"C10","name":"Mi decimo Codigo","type":"Customer"},
+                  {"code":"C01","name":"My first code","type":"Supplier"},
+                  {"code":"C02","name":"My second code","type":"Supplier"},
+                  {"code":"C03","name":"My third code","type":"Supplier"},
+                  {"code":"C04","name":"My fourth code","type":"Supplier"},
+                  {"code":"C05","name":"My fifth code","type":"Customer"},
+                  {"code":"C06","name":"My sixth code","type":"Supplier"},
+                  {"code":"C07","name":"My seventh code","type":"Customer"},
+                  {"code":"C08","name":"My eighth code","type":"Customer"},
+                  {"code":"C09","name":"My ninth code","type":"Customer"},
+                  {"code":"C10","name":"My tenth code","type":"Customer"},
                 ],
+        insertallowed:false,
+        readonly:true,
+        filterData:[],
+        filtervalue:"",
         ready: function () {         
-
+          this.filterData=this.dataGrid;
            
         },
         validateCell:function(event,data){
-          if (data.column=="type"){
+         /* if (data.column=="type"){
             alert("Error de validacion");
             data.control.invalid=true;
-          }
+          }*/
         },
         checkGrid:function(){
           alert("check"+this.$.grid.invalid());
+        },
+        validateFilter:function(){
+          this.filterData=this.dataGrid.filter(function(element,index,arr,value){
+              if (element.code.indexOf(this)!=-1 || element.name.indexOf(this)!=-1 || element.type.indexOf(this)!=-1){
+                return true;
+              }else{
+                return false;
+              }
+          },this.filtervalue);
+        },
+        selectedrow:function(event,obj){
+          
         }
       });
     </script>
   </polymer-element>
-<paper-input label="Prueba"></paper-input>
-<br>
+
   <grid-test ></grid-test>
 
  
