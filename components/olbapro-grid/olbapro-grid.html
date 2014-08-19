@@ -71,6 +71,7 @@
 Polymer('olbapro-grid', {
   rows:1,
   columnsName:[],
+  columns:[],
   currentRow:-1,
   data:[],
   selectedRows:[],
@@ -95,7 +96,7 @@ Polymer('olbapro-grid', {
 
     for (var i=0;i<columns.children.length;i++){
       this.columnsName.push(columns.children[i].id);
-
+      this.columns.push({"id":columns.children[i].id,"label":columns.children[i].label})
       var span=this.$.headerDiv.appendChild(document.createElement("span"));
       span.id="header"+columns.children[i].id;
       span.innerHTML =columns.children[i].label;

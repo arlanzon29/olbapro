@@ -1,0 +1,18 @@
+<polymer-element name="olbapro-customers" attributes="customer">
+<template>
+  <div vertical layout>
+  	<paper-input label="Customer code" id="cardcode" value="{{customer.cardcode}}" floatinglabel></paper-input>
+    <paper-input label="Customer name" id="cardname" value="{{customer.cardname}}" floatinglabel></paper-input>
+
+  </div>
+</template>
+<script>
+ Polymer('olbapro-customers', {
+  	customer:{"cardcode":"","cardname":""},
+    ready: function () {         
+   		
+       
+    }
+ });
+ </script>
+</polymer-element>

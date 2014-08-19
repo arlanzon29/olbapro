@@ -1,0 +1,28 @@
+<polymer-element name="olbapro-items" attributes="item">
+<template >
+  <div vertical layout>
+  	<paper-input label="Item code" id="itemcode" value="{{item.itemcode}}" floatinglabel></paper-input>
+    <paper-input label="Item name" id="itemname" value="{{item.itemname}}" floatinglabel></paper-input>
+    <paper-input label="VAT" id="vat" value="{{item.vat}}" floatinglabel></paper-input>
+    <paper-checkbox label="Inactive" value="{{item.inactive}}"></paper-checkbox>
+    <br>
+    <olbapro-grid id="price" rows="5"  data="{{item.prices}}" selectionmode="none">
+      <olbapro-columns>
+        <olbapro-column id="code" label="Code"  width="60px"  ></olbapro-column>
+        <olbapro-column id="name" label="Name" width="150px"></olbapro-column>
+        <olbapro-column id="price" label="Price" width="100px" updateallowed></olbapro-column>
+      </olbapro-columns>
+    </olbapro-grid> 
+
+  </div>
+</template>
+<script>
+ Polymer('olbapro-items', {
+  	item:{"itemcode":"","itemname":"","vat":21,"inactive":true,prices:[]},
+    ready: function () {         
+   		
+       
+    }
+ });
+ </script>
+</polymer-element>

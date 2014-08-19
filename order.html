@@ -35,6 +35,9 @@
     <link rel="import" href="components/paper-fab/paper-fab.html">
 
     <link rel="import" href="order_pricelist.html">
+    <link rel="import" href="order_items.html">
+    <link rel="import" href="order_customers.html">
+
 
 
     <style>
@@ -88,10 +91,12 @@
           <olbapro-pricelist pricelist="{{pricelist}}" on-save="{{savePriceList}}"></olbapro-pricelist>
         </section>
         <section class="seccion">
-        Items
+          <br>
+          <olbapro-items ></olbapro-items>
         </section>                       
         <section class="seccion">
-        Customers
+          <br>
+          <olbapro-customers></olbapro-customers>
         </section>          
         <section class="seccion">
         Orders
