@@ -71,9 +71,10 @@
 Polymer('olbapro-grid', {
   rows:1,
   columnsName:[],
-  lastRowPainted:-1,
+  currentRow:-1,
   data:[],
   selectedRows:[],
+  deleteRows:[],
   firstRow:0,
   selectionmode:"none",
   insertAllowed:false,
@@ -81,6 +82,7 @@ Polymer('olbapro-grid', {
   maxSlider:5,
   lastSortColumn:"",
   preventDataChanged:false,
+  currentRow:0,
   ready: function () {
     var columns=this.children[0];
 
@@ -179,7 +181,7 @@ Polymer('olbapro-grid', {
 
       if (pos<this.rows-1){ /* if we are no on the last row */
         this.shadowRoot.querySelector("#"+colum+pad(pos+1,3)).$.input.focus(); /* Focus next line control */
-      }else{ /* if we are on the las row */
+      }else{ /* if we are on the last row */
         if (!this.insertAllowed || this.readonly){  /* If we can not insert */
           if (this.firstRow<this.data.length-this.rows){ /* there is more rows to show */
             if (this.setFirstRow(this.firstRow+1)){ /* try to change first row */
@@ -227,9 +229,9 @@ Polymer('olbapro-grid', {
 },
 focus:function(event){
   var pos=parseInt(right(event.currentTarget.id,3));
-  if (this.lastRowPainted!=pos){
-    var r= this.lastRowPainted;
-    this.lastRowPainted=pos;
+  if (this.currentRow!=pos){
+    var r= this.currentRow;
+    this.currentRow=pos;
 
     this.paintRow(pos);
     this.paintRow(r);    
@@ -327,6 +329,8 @@ blur:function(event){
     this.data[this.firstRow+pos].status="I";
     this.preventDataChanged=true;
     this.setMaxSlider();
+    this.refreshData();
+    this.paintData();
   }
 }         
 
@@ -382,6 +386,7 @@ dataChanged:function(){
     /* Unselect all */
     for (var i=0;i<this.data.length;i++){
       this.selectedRows.push(false);
+      this.deleteRows.push(false);
     }
 
     this.paintData();
@@ -416,16 +421,23 @@ clickPosition:function(event){
 paintRow:function(row){
   if (row+this.firstRow<this.data.length){
     var selected=false;
+    var deleted=false;
+
+
     if (this.selectedRows[row+this.firstRow]){
       selected=true;
     }
-
+   if (this.deleteRows[row+this.firstRow]){
+      deleted=true;
+    }
 
     for (var j=0;j<this.columnsName.length;j++){     
       if (selected) {
         this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="orange";
+      }else if(deleted){
+        this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="red";
       }else{
-       if (this.lastRowPainted==row){
+       if (this.currentRow==row){
         this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="lightgreen";
        }else{
         if ((this.firstRow+row)%2==1){
@@ -440,8 +452,10 @@ this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.backgrou
 
     if (selected){
        this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="orange";
+    }else if(deleted){
+        this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="red";
     }else{
-      if (this.lastRowPainted==row){
+      if (this.currentRow==row){
           this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="lightgreen";
       }else{
         if ((this.firstRow+row)%2==1){
@@ -452,12 +466,29 @@ this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.backgrou
         }
     }
   }else{
-    if (row+this.firstRow==this.data.length && this.insertAllowed && !this.readonly && this.lastRowPainted==row){
+    if (row+this.firstRow==this.data.length && this.insertAllowed && !this.readonly ){
+    
       for (var j=0;j<this.columnsName.length;j++){
-        this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="lightgreen";
+        if (this.currentRow==row){
+          this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="lightgreen";
+        } else{
+          if ((this.firstRow+row)%2==1){
+            this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="lightblue";
+          }else{
+          this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="white";
+          } 
+        }
       }
-      this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="lightgreen";
-    }else{
+      if (this.currentRow==row){
+        this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="lightgreen";
+      }else{
+        if ((this.firstRow+row)%2==1){
+            this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="lightblue";
+          }else{
+          this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="white";
+          } 
+      }
+    }else{  /* No es la linea de insercion nueva */
       for (var j=0;j<this.columnsName.length;j++){
         this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="white";
       }
@@ -512,7 +543,39 @@ hiddeColumn:function(columnName){
   for (var i=0;i<this.rows;i++){
      this.shadowRoot.querySelector("#"+columnName+pad(i,3)).hidden=true;
   } 
+},
+getSelectedRows:function(){
+  var arr=[];
+
+  for (var i=0;i<this.selectedRows.length;i++){
+    if (this.selectedRows[i]){
+      arr.push(i);
+    }
+  }
+
+  return arr;
+},
+deleteSelectedRows:function(){
+   for (var i=0;i<this.selectedRows.length;i++){
+    if (this.selectedRows[i]){
+      this.selectedRows[i]=false;
+      this.deleteRows[i]=true;
+      this.paintData();
+    }
+  }
+},
+getDeleteRows:function(){
+  var arr=[];
+
+  for (var i=0;i<this.selectedRows.length;i++){
+    if (this.deleteRows[i]){
+      arr.push(i);
+    }
+  }
+
+  return arr;
 }
+
 });
 
 </script>
