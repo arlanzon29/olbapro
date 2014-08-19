@@ -70,12 +70,7 @@
 <script>
 Polymer('olbapro-grid', {
   rows:1,
-  columnsName:[],
-  columns:[],
   currentRow:-1,
-  data:[],
-  selectedRows:[],
-  deleteRows:[],
   firstRow:0,
   selectionmode:"none",
   insertAllowed:false,
@@ -84,6 +79,13 @@ Polymer('olbapro-grid', {
   lastSortColumn:"",
   preventDataChanged:false,
   currentRow:0,
+  created:function(){
+    this.columnsName=[];
+    this.data=[];
+    this.selectedRows=[];
+    this.deleteRows=[];
+    this.columns=[];
+  },
   ready: function () {
     var columns=this.children[0];
 
