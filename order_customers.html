@@ -22,6 +22,13 @@
           top: 110px;
            background: #5677fc;
       }
+      #cmdAdd
+      {
+          position: absolute;
+          right: 20px;
+          top: 160px;
+           background: #5677fc;
+      }
   </style>
 
   <div vertical layout>
@@ -36,6 +43,7 @@
     <paper-fab icon="save" class="mini" id="cmdSave"  on-click="{{save}}" ></paper-fab>
     <paper-fab icon="delete" class="mini" id="cmdDelete" on-click="{{delete}}" ></paper-fab>
     <paper-fab icon="list" class="mini" id="cmdList" on-click="{{customerList}}" ></paper-fab>
+     <paper-fab icon="add" class="mini" id="cmdAdd" on-click="{{add}}" ></paper-fab>
   </div>
 </template>
 <script>
@@ -46,6 +54,7 @@
     },
      save:function(){      
       this.fire("save");
+      this.mode="update";
     },
     customerList:function(){      
       this.fire("list");
@@ -56,6 +65,11 @@
       }else{
         this.mode="update";
       }
+    },add:function(){
+      this.customer.cardcode="";
+      this.customer.cardname="";
+      this.customer.pricelist="";
+      this.mode="insert";
     }
  });
  </script>
