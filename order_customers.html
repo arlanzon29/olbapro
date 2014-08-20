@@ -1,17 +1,61 @@
-<polymer-element name="olbapro-customers" attributes="customer">
+<polymer-element name="olbapro-customers" attributes="customer pricelist">
 <template>
+    <style>
+    #cmdSave
+      {
+          position: absolute;
+          right: 20px;
+          top: 10px;
+           background: #5677fc;
+      }
+      #cmdDelete
+      {
+          position: absolute;
+          right: 20px;
+          top: 60px;
+           background: #5677fc;
+      }
+      #cmdList
+      {
+          position: absolute;
+          right: 20px;
+          top: 110px;
+           background: #5677fc;
+      }
+  </style>
+
   <div vertical layout>
   	<paper-input label="Customer code" id="cardcode" value="{{customer.cardcode}}" floatinglabel></paper-input>
     <paper-input label="Customer name" id="cardname" value="{{customer.cardname}}" floatinglabel></paper-input>
-
-
+<span>Price List</span>
+<paper-radio-group selected="{{customer.pricelist}}">
+	<template repeat="{{ value, j in pricelist }}">
+	    <paper-radio-button label="{{value.name}}" value="{{value.code}}" name="{{value.code}}"></paper-radio-button><br>
+	  </template>      
+    </paper-radio-group>
+    <paper-fab icon="save" class="mini" id="cmdSave"  on-click="{{save}}" ></paper-fab>
+    <paper-fab icon="delete" class="mini" id="cmdDelete" on-click="{{delete}}" ></paper-fab>
+    <paper-fab icon="list" class="mini" id="cmdList" on-click="{{customerList}}" ></paper-fab>
   </div>
 </template>
 <script>
  Polymer('olbapro-customers', {
-
+    mode:"insert",
   	customer:{"cardcode":"","cardname":""},
     ready: function () {         
+    },
+     save:function(){      
+      this.fire("save");
+    },
+    customerList:function(){      
+      this.fire("list");
+    },
+    customerChanged:function(){
+      if (this.customer.cardcode==""){
+        this.mode="insert";
+      }else{
+        this.mode="update";
+      }
     }
  });
  </script>

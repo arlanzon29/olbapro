@@ -33,11 +33,14 @@
     <link rel="import" href="components/core-animated-pages/transitions/tile-cascade.html">
     <link rel="import" href="components/core-localstorage/core-localstorage.html">
     <link rel="import" href="components/paper-fab/paper-fab.html">
+ <link rel="import" href="components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="components/paper-dialog/paper-dialog.html">
 
     <link rel="import" href="order_pricelist.html">
     <link rel="import" href="order_items.html">
     <link rel="import" href="order_customers.html">
-
+ <link rel="import" href="order_customerdialog.html">
 
 
     <style>
@@ -65,6 +68,7 @@
   <polymer-element name="olbapro-order">
     <template>
       <core-localstorage id="pricelist" name="pricelist" value="{{pricelist}}"></core-localstorage>
+      <core-localstorage id="customers" name="customers" value="{{customers}}"></core-localstorage>
    
      <core-scaffold id="scaffold">
       <core-header-panel mode="seamed" id="core_header_panel" navigation flex>
@@ -96,7 +100,7 @@
         </section>                       
         <section class="seccion">
           <br>
-          <olbapro-customers></olbapro-customers>                   
+          <olbapro-customers pricelist="{{pricelist}}" on-save="{{saveCustomer}}" customer="{{customer}}" on-list="{{customerList}}" id="customersElement"></olbapro-customers>                   
         </section>          
         <section class="seccion">
         Orders
@@ -104,14 +108,19 @@
       </core-animated-pages>
 
     </core-scaffold>
+    <olbapro-customerdialog id="customerlistdialog" customers="{{customers}}" selectedCustomer="{{customer}}"></olbapro-customerdialog>
     </template>
+
     <script>
       
       Polymer('olbapro-order', {
-        pricelist:[],
+        
+        created:function(){
+          this.pricelist=[];
+          this.customers=[];
+        },
         ready: function () {         
           
-           
         },
         menuClick:function(event,a,b){
           switch(event.currentTarget.id){
@@ -146,6 +155,19 @@
         },
         savePriceList:function(){
           this.$.pricelist.save();
+        },
+        saveCustomer:function(){
+          if ( this.customers == "undefined") {
+            this.customers=[];
+          }
+          if (this.$.customersElement.mode=="insert"){
+                this.customers.push(this.customer);
+          }
+      
+          this.$.customers.save();
+        },
+        customerList:function(){
+          this.$.customerlistdialog.show();
         }
       });
     </script>

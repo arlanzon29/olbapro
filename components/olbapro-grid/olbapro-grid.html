@@ -7,8 +7,6 @@
 
   :host {
     position: absolute;
-    
-
     box-sizing: border-box;
     margin: 0;
   }
@@ -54,10 +52,13 @@
     border-top: 1px solid black;
     border-right: 1px solid black;
   }
+  #main{
+    display: block;
+  }
 
 
   </style>
-  <div >
+  <div id="main">
     <div id="headerDiv" class="gridHeader" horizontal layout></div>
     <div id="mydiv" class="gridDiv"  >
 
@@ -167,6 +168,7 @@ Polymer('olbapro-grid', {
     }
     
     this.refreshData();
+
 
   },
   /* Check key for arrows,scape */
