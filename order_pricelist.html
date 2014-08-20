@@ -42,10 +42,11 @@
 		}
     },
     save:function(){
-    	var deleteRows=this.$.grid.getDeleteRows(); 
+      this.$.grid.updateData();
+    	/*var deleteRows=this.$.grid.getDeleteRows(); 
     	for (var i=deleteRows.length-1;i>=0;i--){
     		this.pricelist.splice(this.filterData[deleteRows[i]].position, 1);
-    	}
+    	}*/
     	this.fire("save");
     	this.filterData=this.pricelist;
     },

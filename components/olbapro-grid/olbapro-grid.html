@@ -77,14 +77,11 @@ Polymer('olbapro-grid', {
   readOnly:false,
   maxSlider:5,
   lastSortColumn:"",
-  preventDataChanged:false,
   currentRow:0,
   created:function(){
-    this.columnsName=[];
     this.data=[];
-    this.selectedRows=[];
-    this.deleteRows=[];
     this.columns=[];
+    this.dataGrid=[];
   },
   ready: function () {
     var columns=this.children[0];
@@ -96,8 +93,7 @@ Polymer('olbapro-grid', {
     span.style.width="24px";
     span.style.height="30px";
 
-    for (var i=0;i<columns.children.length;i++){
-      this.columnsName.push(columns.children[i].id);
+    for (var i=0;i<columns.children.length;i++){      
       this.columns.push({"id":columns.children[i].id,"label":columns.children[i].label})
       var span=this.$.headerDiv.appendChild(document.createElement("span"));
       span.id="header"+columns.children[i].id;
@@ -165,9 +161,9 @@ Polymer('olbapro-grid', {
 
 
     if (this.insertAllowed){
-      this.maxSlider=this.data.length-this.rows+2;
+      this.maxSlider=this.dataGrid.length-this.rows+2;
     }else{
-      this.maxSlider=this.data.length-this.rows+1;
+      this.maxSlider=this.dataGrid.length-this.rows+1;
     }
     
     this.refreshData();
@@ -186,7 +182,7 @@ Polymer('olbapro-grid', {
         this.shadowRoot.querySelector("#"+colum+pad(pos+1,3)).$.input.focus(); /* Focus next line control */
       }else{ /* if we are on the last row */
         if (!this.insertAllowed || this.readonly){  /* If we can not insert */
-          if (this.firstRow<this.data.length-this.rows){ /* there is more rows to show */
+          if (this.firstRow<this.dataGrid.length-this.rows){ /* there is more rows to show */
             if (this.setFirstRow(this.firstRow+1)){ /* try to change first row */
               this.refreshData();  /*Refresh data */
               this.paintData();
@@ -195,10 +191,10 @@ Polymer('olbapro-grid', {
             }            
           }
         }else{ /* Insert allowed */
-         if (this.firstRow==this.data.length-this.rows){ /* we are on de lastrow */
-          this.shadowRoot.querySelector("#"+this.columnsName[0]+pad(pos,3)).$.input.focus(); /* focus on the prior line */
+         if (this.firstRow==this.dataGrid.length-this.rows){ /* we are on de lastrow */
+          this.shadowRoot.querySelector("#"+this.columns[0].id+pad(pos,3)).$.input.focus(); /* focus on the prior line */
         }
-        if (this.firstRow<this.data.length-this.rows+1){ /* if there is prior rows */
+        if (this.firstRow<this.dataGrid.length-this.rows+1){ /* if there is prior rows */
          if (this.setFirstRow(this.firstRow+1)){ /* try to change first row */
           this.refreshData(); /* Refresh Data */
           this.paintData();
@@ -226,7 +222,7 @@ Polymer('olbapro-grid', {
 }else if (event.keyCode=="27"){ /* scape */
   var pos=parseInt(right(event.currentTarget.id,3));
   var colum=left(event.currentTarget.id,event.currentTarget.id.length-3)
-  this.shadowRoot.querySelector("#"+colum+pad(pos,3)).value=this.data[this.firstRow+pos][colum];
+  this.shadowRoot.querySelector("#"+colum+pad(pos,3)).value=this.dataGrid[this.firstRow+pos][colum];
   /* reset value */
 }
 },
@@ -242,11 +238,11 @@ focus:function(event){
 },
 refreshData:function(){
   for (var i=0;i<this.rows;i++){
-    if (i+this.firstRow<this.data.length){
-      var ele=this.data[this.firstRow+i];
-      for (var j=0;j<this.columnsName.length;j++){
-        var ctr=this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(i,3));
-        ctr.value=ele[this.columnsName[j]];
+    if (i+this.firstRow<this.dataGrid.length){
+      var ele=this.dataGrid[this.firstRow+i];
+      for (var j=0;j<this.columns.length;j++){
+        var ctr=this.shadowRoot.querySelector("#"+this.columns[j].id+pad(i,3));
+        ctr.value=ele[this.columns[j].id];
         ctr.disabled=false;
         if (!ctr.updateallowed || this.readonly){
           ctr.readonly=true;
@@ -255,15 +251,15 @@ refreshData:function(){
         }
       }  
       this.shadowRoot.querySelector("#pos"+pad(i,3)).value=this.firstRow+i+1;
-    }else if (i+this.firstRow==this.data.length){
-      for (var j=0;j<this.columnsName.length;j++){
-        var ctr=this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(i,3))
+    }else if (i+this.firstRow==this.dataGrid.length){
+      for (var j=0;j<this.columns.length;j++){
+        var ctr=this.shadowRoot.querySelector("#"+this.columns[j].id+pad(i,3))
         ctr.value=""; 
         if (this.insertAllowed && !this.readonly){
           ctr.readonly=false;
           ctr.disabled=false;
         }else{
-          var ctr=this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(i,3))
+          var ctr=this.shadowRoot.querySelector("#"+this.columns[j].id+pad(i,3))
          
           ctr.readonly=true;
           ctr.disabled=true;       
@@ -279,8 +275,8 @@ refreshData:function(){
       }
 
     }else{
-      for (var j=0;j<this.columnsName.length;j++){
-        var ctr=this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(i,3))
+      for (var j=0;j<this.columns.length;j++){
+        var ctr=this.shadowRoot.querySelector("#"+this.columns[j].id+pad(i,3))
         ctr.value=""; 
         ctr.readonly=true;      
         ctr.disabled=true;
@@ -295,8 +291,8 @@ blur:function(event){
   var colum=left(event.currentTarget.id,event.currentTarget.id.length-3)
   var value=this.shadowRoot.querySelector("#"+event.currentTarget.id).value
 
-  if (this.firstRow+pos<this.data.length){
-    if (value!=this.data[this.firstRow+pos][colum]){
+  if (this.firstRow+pos<this.dataGrid.length){
+    if (value!=this.dataGrid[this.firstRow+pos][colum]){
      var obj={
       "column":colum,
       "row":this.firstRow+pos,
@@ -312,8 +308,12 @@ blur:function(event){
       obj.control.style.background="red";
     }else{
       obj.control.style.background="lightgreen";
-      this.data[this.firstRow+pos][colum]=value;
-      this.data[this.firstRow+pos].status="U";
+      this.dataGrid[this.firstRow+pos][colum]=value;
+
+      if ( this.dataGrid[this.firstRow+pos].opg_status=="ok"){
+        this.dataGrid[this.firstRow+pos].opg_status="update"
+      }
+      
     }
   }else{
     this.shadowRoot.querySelector("#"+event.currentTarget.id).invalid=false;
@@ -323,14 +323,14 @@ blur:function(event){
 }else{
   if (value!=""){
     var newObj={};
-    for(var j=0;j<this.columnsName.length;j++) {
-      newObj[this.columnsName[j]]="";
+    for(var j=0;j<this.columns.length;j++) {
+      newObj[this.columns[j].id]="";
     } 
-    this.preventDataChanged=true;
-    this.data.push(newObj);
-    this.data[this.firstRow+pos][colum]=value;
-    this.data[this.firstRow+pos].status="I";
-    this.preventDataChanged=true;
+    newObj.opg_status="add";
+    newObj.opg_position=-1;
+    this.dataGrid.push(newObj);
+    this.dataGrid[this.firstRow+pos][colum]=value;
+    this.dataGrid[this.firstRow+pos].status="I";
     this.setMaxSlider();
     this.refreshData();
     this.paintData();
@@ -340,8 +340,8 @@ blur:function(event){
 },
 isInvalid:function(){
   for (var i=0;i<this.rows;i++){
-    for (var j=0;j<this.columnsName.length;j++){
-      if (this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(i,3)).invalid){
+    for (var j=0;j<this.columns.length;j++){
+      if (this.shadowRoot.querySelector("#"+this.columns[j].id+pad(i,3)).invalid){
         return true;
       }
     }
@@ -367,9 +367,9 @@ changeSlider:function(){
 },
 setMaxSlider:function(){
  if (this.insertAllowed && !this.readonly){
-    this.maxSlider=this.data.length-this.rows+2;
+    this.maxSlider=this.dataGrid.length-this.rows+2;
   }else{
-    this.maxSlider=this.data.length-this.rows+1;
+    this.maxSlider=this.dataGrid.length-this.rows+1;
   }
 },
 readonlyChanged:function(){
@@ -383,38 +383,49 @@ insertAllowedChanged:function(){
   this.setMaxSlider();
 },
 dataChanged:function(){
-  if (!this.preventDataChanged){
+
+    /* Fill dataGrid with data value */
+    this.dataGrid=[];
+
+    for (var i=0;i<this.data.length;i++){
+      var obj={};
+      for (var j=0;j<this.columns.length;j++){
+        obj[this.columns[j].id]=this.data[i][this.columns[j].id];
+      }
+      obj.opg_position=i;
+      obj.opg_status="ok";
+      obj.opq_selected=false;
+      this.dataGrid.push(obj);
+    }
+
+
     this.setFirstRow(0);
     this.refreshData();
-    /* Unselect all */
-    for (var i=0;i<this.data.length;i++){
-      this.selectedRows.push(false);
-      this.deleteRows.push(false);
-    }
+    
 
     this.paintData();
     this.setMaxSlider();
     this.$.slider.value=1;
-  }
+
  
 },
 clickPosition:function(event){
   if (this.selectionmode!="none"){
     var pos=parseInt(right(event.currentTarget.id,3));
-    if (pos+this.firstRow<this.data.length){
+    if (pos+this.firstRow<this.dataGrid.length){
       if (this.selectionmode=="multiple"){
-       this.selectedRows[pos+this.firstRow]=!this.selectedRows[pos+this.firstRow]; 
+       this.dataGrid[pos+this.firstRow].opq_selected=!this.dataGrid[pos+this.firstRow].opq_selected; 
      }else{ /*single */
-      for (var i=0;i<this.selectedRows.length;i++){
-        this.selectedRows[i]=false;
+      for (var i=0;i<this.dataGrid.length;i++){
+        this.dataGrid[i].opq_selected=false;
       }
-      this.selectedRows[pos+this.firstRow]=true; 
+      this.dataGrid[pos+this.firstRow].opq_selected=true; 
      }
       
 
       this.paintData();
-     if (this.selectedRows[pos+this.firstRow]){
-      var obj={"data":this.data[pos+this.firstRow],"position":pos+this.firstRow}
+     if (this.dataGrid[pos+this.firstRow].opq_selected){
+      var obj={"data":this.dataGrid[pos+this.firstRow],"position":pos+this.firstRow}
          this.fire("selectedrow",obj);
 
      }
@@ -422,31 +433,31 @@ clickPosition:function(event){
   }  
 },
 paintRow:function(row){
-  if (row+this.firstRow<this.data.length){
+  if (row+this.firstRow<this.dataGrid.length){
     var selected=false;
     var deleted=false;
 
 
-    if (this.selectedRows[row+this.firstRow]){
+    if (this.dataGrid[row+this.firstRow].opq_selected){
       selected=true;
     }
-   if (this.deleteRows[row+this.firstRow]){
+   if (this.dataGrid[row+this.firstRow].opg_status=="deleted"){
       deleted=true;
     }
 
-    for (var j=0;j<this.columnsName.length;j++){     
+    for (var j=0;j<this.columns.length;j++){     
       if (selected) {
-        this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="orange";
+        this.shadowRoot.querySelector("#"+this.columns[j].id+pad(row,3)).style.background="orange";
       }else if(deleted){
-        this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="red";
+        this.shadowRoot.querySelector("#"+this.columns[j].id+pad(row,3)).style.background="red";
       }else{
        if (this.currentRow==row){
-        this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="lightgreen";
+        this.shadowRoot.querySelector("#"+this.columns[j].id+pad(row,3)).style.background="lightgreen";
        }else{
         if ((this.firstRow+row)%2==1){
-this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="lightblue";
+this.shadowRoot.querySelector("#"+this.columns[j].id+pad(row,3)).style.background="lightblue";
         }else{
-          this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="white";
+          this.shadowRoot.querySelector("#"+this.columns[j].id+pad(row,3)).style.background="white";
         }
         
        }
@@ -469,16 +480,16 @@ this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.backgrou
         }
     }
   }else{
-    if (row+this.firstRow==this.data.length && this.insertAllowed && !this.readonly ){
+    if (row+this.firstRow==this.dataGrid.length && this.insertAllowed && !this.readonly ){
     
-      for (var j=0;j<this.columnsName.length;j++){
+      for (var j=0;j<this.columns.length;j++){
         if (this.currentRow==row){
-          this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="lightgreen";
+          this.shadowRoot.querySelector("#"+this.columns[j].id+pad(row,3)).style.background="lightgreen";
         } else{
           if ((this.firstRow+row)%2==1){
-            this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="lightblue";
+            this.shadowRoot.querySelector("#"+this.columns[j].id+pad(row,3)).style.background="lightblue";
           }else{
-          this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="white";
+          this.shadowRoot.querySelector("#"+this.columns[j].id+pad(row,3)).style.background="white";
           } 
         }
       }
@@ -492,8 +503,8 @@ this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.backgrou
           } 
       }
     }else{  /* No es la linea de insercion nueva */
-      for (var j=0;j<this.columnsName.length;j++){
-        this.shadowRoot.querySelector("#"+this.columnsName[j]+pad(row,3)).style.background="white";
+      for (var j=0;j<this.columns.length;j++){
+        this.shadowRoot.querySelector("#"+this.columns[j].id+pad(row,3)).style.background="white";
       }
       this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="white";
     }
@@ -510,17 +521,17 @@ clickHeader:function(event){
   var column=event.currentTarget.id.substring(6);
 this.hiddeColumn(column);
   if (this.lastSortColumn==column){
-    this.data.reverse(this.sortFunction(column));
+    this.dataGrid.reverse(this.sortFunction(column));
     this.lastSortColumn="";
 
   }else{
-    this.data.sort(this.sortFunction(column));
+    this.dataGrid.sort(this.sortFunction(column));
     this.lastSortColumn=column;
   }
 
  
-  for (var i=0;i<this.selectedRows.length;i++){
-    this.selectedRows[i]=false;
+  for (var i=0;i<this.dataGrid.length;i++){
+    this.dataGrid[i].opq_selected=false;
   }
   if (this.setFirstRow(0)){
     this.refreshData();
@@ -550,8 +561,8 @@ hiddeColumn:function(columnName){
 getSelectedRows:function(){
   var arr=[];
 
-  for (var i=0;i<this.selectedRows.length;i++){
-    if (this.selectedRows[i]){
+  for (var i=0;i<this.dataGrid.length;i++){
+    if (this.dataGrid[i].opq_selected){
       arr.push(i);
     }
   }
@@ -559,10 +570,10 @@ getSelectedRows:function(){
   return arr;
 },
 deleteSelectedRows:function(){
-   for (var i=0;i<this.selectedRows.length;i++){
-    if (this.selectedRows[i]){
-      this.selectedRows[i]=false;
-      this.deleteRows[i]=true;
+   for (var i=0;i<this.dataGrid.length;i++){
+    if (this.dataGrid[i].opq_selected){
+      this.dataGrid[i].opq_selected=false;
+      this.dataGrid[i].opg_status="deleted";
       this.paintData();
     }
   }
@@ -570,13 +581,43 @@ deleteSelectedRows:function(){
 getDeleteRows:function(){
   var arr=[];
 
-  for (var i=0;i<this.selectedRows.length;i++){
-    if (this.deleteRows[i]){
+  for (var i=0;i<this.dataGrid.length;i++){
+    if (this.dataGrid[i].opg_status=="deleted"){
       arr.push(i);
     }
   }
 
   return arr;
+},
+updateData:function(){
+  /* Inserts and updates */
+  for (var i=0;i<this.dataGrid.length;i++){
+    var newObj=this.dataGrid[i];
+
+    if (newObj.opg_status=="update"){
+      var olbObj=this.data[newObj.opg_position];
+      for (var j=0;j<this.columns.length;j++){
+        olbObj[this.columns[j].id]=newObj[this.columns[j].id];
+      }
+    }else if (newObj.opg_status=="add"){
+      var oldObj={};
+      for (var j=0;j<this.columns.length;j++){
+        oldObj[this.columns[j].id]=newObj[this.columns[j].id];
+      }
+      this.data.push(oldObj);
+    }
+  }
+
+  /* Delete */
+
+
+  for (var i=this.dataGrid.length-1;i>=0;i--){
+     var newObj=this.dataGrid[i];
+
+    if (newObj.opg_status=="deleted" && newObj.opg_position!=-1){
+      this.data.splice(newObj.opg_position,1);
+    }
+  }
 }
 
 });
