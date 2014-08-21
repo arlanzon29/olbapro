@@ -8,6 +8,11 @@
       width: 200px;
 
     }
+    #colButtons{
+         position: absolute;
+          right: 20px;
+          top: 60px;
+      }
     #divCustomer{
     }
   </style>
@@ -84,6 +89,15 @@
     },collapse:function(event){
       this.$["col"+event.currentTarget.id].toggle();
 
+    },
+    moreButtons:function(){
+      if (!this.$.colButtons.opened){
+        this.$.colButtons.opened=true;
+        this.$.cmdMore.icon="expand-less";
+      }else{
+        this.$.colButtons.opened=false;
+        this.$.cmdMore.icon="expand-more";
+      }
     }
  });
  </script>

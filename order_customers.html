@@ -1,49 +1,78 @@
 <polymer-element name="olbapro-customers" attributes="customer pricelist">
 <template>
     <style>
-    #cmdSave
+     #cmdMore
       {
           position: absolute;
           right: 20px;
           top: 10px;
+           background: tomato;
+      }
+    #cmdSave
+      {
            background: #5677fc;
       }
       #cmdDelete
       {
-          position: absolute;
-          right: 20px;
-          top: 60px;
+         
            background: #5677fc;
       }
       #cmdList
       {
-          position: absolute;
-          right: 20px;
-          top: 110px;
+          
            background: #5677fc;
       }
       #cmdAdd
       {
-          position: absolute;
-          right: 20px;
-          top: 160px;
+          
            background: #5677fc;
       }
+      #colButtons{
+         position: absolute;
+          right: 20px;
+          top: 60px;
+      }
+      .box {
+      background: #eee;
+    }
   </style>
+  <section style="background: steelblue;">
+      <paper-button label="Master Data" on-click="{{collapse}}" id="Master"></paper-button>
+      <core-collapse id="colMaster"  class="box" opened  >
+        <div vertical layout>
+        	<paper-input label="Customer code" id="cardcode" value="{{customer.cardcode}}" floatinglabel></paper-input>
+          <paper-input label="Customer name" id="cardname" value="{{customer.cardname}}" floatinglabel></paper-input>
+          <span>Price List</span>
+          <paper-radio-group selected="{{customer.pricelist}}">
+      	   <template repeat="{{ value, j in pricelist }}">
+      	    <paper-radio-button label="{{value.name}}" value="{{value.code}}" name="{{value.code}}"></paper-radio-button><br>
+      	   </template>      
+          </paper-radio-group>
+        </div>
+      </core-collapse>
+    </section>
+    <br>
+    <section style="background: steelblue;">
+      <paper-button label="Address" on-click="{{collapse}}" id="Address"></paper-button>
+      <core-collapse id="colAddress"  class="box" opened  >
+        <paper-input label="Address" multiline maxRows="5" value="{{customer.address}}"  floatinglabel ></paper-input>
+      </core-collapse>
+    </section>
+    <paper-fab icon="expand-more" class="mini" id="cmdMore"  on-click="{{moreButtons}}" ></paper-fab>
+    <core-collapse id="colButtons"  class="box"  >
+      <div vertical layout>
+        <paper-fab icon="save" class="mini" id="cmdSave"  on-click="{{save}}" ></paper-fab>
+        <br>
+        <paper-fab icon="delete" class="mini" id="cmdDelete" on-click="{{delete}}" ></paper-fab>
+        <br>
+        <paper-fab icon="list" class="mini" id="cmdList" on-click="{{customerList}}" ></paper-fab>
+        <br>
+        <paper-fab icon="add" class="mini" id="cmdAdd" on-click="{{add}}" ></paper-fab>
+        <br>
+      </div>
+    </core-collapse>
 
-  <div vertical layout>
-  	<paper-input label="Customer code" id="cardcode" value="{{customer.cardcode}}" floatinglabel></paper-input>
-    <paper-input label="Customer name" id="cardname" value="{{customer.cardname}}" floatinglabel></paper-input>
-<span>Price List</span>
-<paper-radio-group selected="{{customer.pricelist}}">
-	<template repeat="{{ value, j in pricelist }}">
-	    <paper-radio-button label="{{value.name}}" value="{{value.code}}" name="{{value.code}}"></paper-radio-button><br>
-	  </template>      
-    </paper-radio-group>
-    <paper-fab icon="save" class="mini" id="cmdSave"  on-click="{{save}}" ></paper-fab>
-    <paper-fab icon="delete" class="mini" id="cmdDelete" on-click="{{delete}}" ></paper-fab>
-    <paper-fab icon="list" class="mini" id="cmdList" on-click="{{customerList}}" ></paper-fab>
-     <paper-fab icon="add" class="mini" id="cmdAdd" on-click="{{add}}" ></paper-fab>
+    
   </div>
 </template>
 <script>
@@ -55,9 +84,13 @@
      save:function(){      
       this.fire("save");
       this.mode="update";
+      this.$.colButtons.opened=false;
+        this.$.cmdMore.icon="expand-more";
     },
     customerList:function(){      
       this.fire("list");
+      this.$.colButtons.opened=false;
+        this.$.cmdMore.icon="expand-more";
     },
     customerChanged:function(){
       if (this.customer.cardcode==""){
@@ -70,7 +103,22 @@
       this.customer.cardname="";
       this.customer.pricelist="";
       this.mode="insert";
+      this.$.colButtons.opened=false;
+        this.$.cmdMore.icon="expand-more";
+    },collapse:function(event){
+      this.$["col"+event.currentTarget.id].toggle();
+
+    },
+    moreButtons:function(){
+      if (!this.$.colButtons.opened){
+        this.$.colButtons.opened=true;
+        this.$.cmdMore.icon="expand-less";
+      }else{
+        this.$.colButtons.opened=false;
+        this.$.cmdMore.icon="expand-more";
+      }
     }
+
  });
  </script>
 </polymer-element>

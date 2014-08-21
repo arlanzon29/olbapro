@@ -61,6 +61,7 @@
           width: 100%;
           height: 100%;
         }
+     
     </style>
    
 </head>
@@ -72,6 +73,8 @@
       <core-localstorage id="pricelist" name="pricelist" value="{{pricelist}}"></core-localstorage>
       <core-localstorage id="customers" name="customers" value="{{customers}}"></core-localstorage>
    
+  
+
      <core-scaffold id="scaffold">
       <core-header-panel mode="seamed" id="core_header_panel" navigation flex>
         <core-toolbar id="core_toolbar"></core-toolbar>
@@ -84,7 +87,10 @@
           <core-item id="cmdOrder" icon="settings" label="Orders" horizontal center layout on-click="{{menuClick}}"></core-item>          
         </core-menu>
       </core-header-panel>
-      <div id="div" tool><span id="title">Home </span></div>
+      <div id="div" tool>
+        <span id="title">Home </span> 
+       </div>
+    </core-collapse></div>
       <core-animated-pages  selected="{{core_selected}}" selectedindex="0" notap id="core_animated_pages" >
         <section class="seccion">
         Home 
@@ -109,8 +115,13 @@
         </section>          
       </core-animated-pages>
 
+
+
     </core-scaffold>
     <olbapro-customerdialog id="customerlistdialog" customers="{{customers}}" selectedCustomer="{{customer}}"></olbapro-customerdialog>
+
+        
+        
     </template>
 
     <script>
@@ -170,6 +181,15 @@
         },
         customerList:function(){
           this.$.customerlistdialog.show();
+        },
+        moreButtons:function(){
+          if (!this.$.colButtons.opened){
+            this.$.colButtons.opened=true;
+            this.$.cmdMore.icon="expand-less";
+          }else{
+            this.$.colButtons.opened=false;
+            this.$.cmdMore.icon="expand-more";
+          }
         }
       });
     </script>
