@@ -1,0 +1,90 @@
+<polymer-element name="olbapro-orderform" attributes="order">
+<template >
+  <style>
+   .box {
+      background: #eee;
+    }
+    .smalltext{
+      width: 200px;
+
+    }
+    #divCustomer{
+    }
+  </style>
+    <section style="background: steelblue;">
+      <paper-button label="Master Data" on-click="{{collapse}}" id="Master"></paper-button>
+      <core-collapse id="colMaster"  class="box" opened  >
+        <div horizontal layout>
+         <div vertical layout id="divCustomer" style="width:50%">
+            <paper-input label="Customer" class="smalltext" floatinglabel value="{{order.customer}}"></paper-input>
+            <paper-input label="Name" class="smalltext" value="{{order.name}}" floatinglabel></paper-input>
+            <paper-input label="Reference" class="smalltext" value="{{order.reference}}" floatinglabel></paper-input>
+          </div>
+          <div vertical layout style="width:50%">
+            <paper-input label="Order number" class="smalltext" value="{{order.number}}" floatinglabel></paper-input>
+            <paper-input label="Doc. date" class="smalltext" value="{{order.date}}" floatinglabel> </paper-input>
+            <paper-input label="Ship date" class="smalltext" value="{{order.shipdate}}" floatinglabel></paper-input>
+          </div>
+        <div>
+      </core-collapse>
+    </section>
+    <br>
+    <section style="background: steelblue;">
+      <paper-button label="Address" on-click="{{collapse}}" id="Address"></paper-button>
+      <core-collapse id="colAddress"  class="box" opened  >
+        <paper-input label="Address" multiline maxRows="5" value="{{order.address}}"  floatinglabel ></paper-input>
+
+      </core-collapse>
+    </section>
+            <br>
+    <section style="background: steelblue;">
+      <paper-button label="Document Total" on-click="{{collapse}}" id="Total"></paper-button>
+      <core-collapse id="colTotal"  class="box" opened  vertical layout>
+        <paper-input label="Base" value="{{order.base}}" floatinglabel></paper-input>
+        <paper-input label="Vat" value="{{order.vat}}" floatinglabel></paper-input>
+        <paper-input label="Total" value="{{order.total}}" floatinglabel></paper-input>        
+      </core-collapse>
+    </section>    
+<br>
+    <section style="background: steelblue;overflow:scroll">
+      <paper-button label="Lines2" on-click="{{collapse}}" id="Lines"></paper-button>
+      <core-collapse id="colLines"  class="box" opened >
+      <br>
+      <div style="overflow:scroll;overflow-y:hidden;">
+        <olbapro-grid  rows="5" data="{{order.lines}}"  selectionmode="none" >
+            <olbapro-columns>
+              <olbapro-column id="item" label="Item"  width="60"  ></olbapro-column>
+              <olbapro-column id="description" label="Description" width="150"></olbapro-column>
+              <olbapro-column id="quantity" label="Quantity" width="100" updateallowed></olbapro-column>
+              <olbapro-column id="price" label="Price" width="100" updateallowed></olbapro-column>
+              <olbapro-column id="total" label="Total" width="100" updateallowed></olbapro-column>
+            </olbapro-columns>
+          </olbapro-grid>         
+      </core-collapse>
+    </div>
+    </section> 
+ 
+</template>
+<script>
+ Polymer('olbapro-orderform', {
+
+    ready: function () {         
+   		
+       
+    },
+    created:function(){
+      this.order={"number":1,"date":"21/08/2014","shipdate":"25/08/2014","customer":"C01",
+      "name":"My first customer","reference":"Su pedido","address":"C/ VITORIA 115\n09007 BURGOS\nBURGOS ESPAÑA",
+      "base":100,"vat":21,"total":121,
+      "lines":[
+          {"item":"A01","description":"My first item","quantity":2,"price":150,"total":300},
+          {"item":"A02","description":"My second item","quantity":3,"price":120,"total":360},
+            
+      ]}
+    },collapse:function(event){
+      this.$["col"+event.currentTarget.id].toggle();
+
+    }
+ });
+ </script>
+</polymer-element>

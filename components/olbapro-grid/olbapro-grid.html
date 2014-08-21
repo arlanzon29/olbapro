@@ -6,7 +6,7 @@
 
 
   :host {
-    position: absolute;
+
     box-sizing: border-box;
     margin: 0;
   }
@@ -39,7 +39,7 @@
     display:block;
     font-size: 14px;
     font-weight: bold;
-    background-color:RoyalBlue  ;
+    background-color:steelblue  ;
     color:white;
     text-align: left;
     padding-left:5px; 
@@ -94,23 +94,27 @@ Polymer('olbapro-grid', {
     span.style.width="24px";
     span.style.height="30px";
 
+    var totalWidth=24+5+2; /* width +padding+border */
     for (var i=0;i<columns.children.length;i++){      
       this.columns.push({"id":columns.children[i].id,"label":columns.children[i].label})
       var span=this.$.headerDiv.appendChild(document.createElement("span"));
       span.id="header"+columns.children[i].id;
       span.innerHTML =columns.children[i].label;
       span.className="header";   
-      span.onclick=function(event){this.offsetParent.clickHeader(event)};
+
+      span.grid=this;
+      span.onclick=function(event){this.grid.clickHeader(event)};
           
 
       var width=columns.children[i].width;
+      totalWidth+=parseInt(width)+5+1; /* width +padding+border */
 
       if (width!=""){
-        span.style.width=width;
+        span.style.width=width+"px";
       }
       span.style.height="30px";
     }
-
+    this.$.main.style.width=(parseInt(totalWidth))+"px";
 
     for (var j=0;j<this.rows;j++){
       var row=this.$.mydiv.appendChild(document.createElement("div"));
@@ -123,7 +127,8 @@ Polymer('olbapro-grid', {
       span.style.width="24px";
       span.style.height="30px";
       span.disabled=true;
-      span.onclick=function(event){this.offsetParent.clickPosition(event)};
+      span.grid=this;
+      span.onclick=function(event){this.grid.clickPosition(event)};
 
 
       for (var i=0;i<columns.children.length;i++){
@@ -148,13 +153,16 @@ Polymer('olbapro-grid', {
         }
 
         if (width!=""){
-          obj.style.width=width;
+          obj.style.width=width+"px";
         }
         obj.style.height="30px";
 
-        obj.onkeydown=function(event){this.offsetParent.keyDown(event)};
-        obj.onfocus=function(event){this.offsetParent.focus(event)};
-        obj.onblur=function(event){this.offsetParent.blur(event)};
+        obj.grid=this;
+        obj.onkeydown=function(event){
+          this.grid.keyDown(event)
+        };
+        obj.onfocus=function(event){this.grid.focus(event)};
+        obj.onblur=function(event){this.grid.blur(event)};
 
         row.appendChild(obj);
       }             

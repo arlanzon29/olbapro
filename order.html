@@ -33,14 +33,16 @@
     <link rel="import" href="components/core-animated-pages/transitions/tile-cascade.html">
     <link rel="import" href="components/core-localstorage/core-localstorage.html">
     <link rel="import" href="components/paper-fab/paper-fab.html">
- <link rel="import" href="components/paper-radio-group/paper-radio-group.html">
-<link rel="import" href="components/paper-radio-button/paper-radio-button.html">
-<link rel="import" href="components/paper-dialog/paper-dialog.html">
+    <link rel="import" href="components/paper-radio-group/paper-radio-group.html">
+    <link rel="import" href="components/paper-radio-button/paper-radio-button.html">
+    <link rel="import" href="components/paper-dialog/paper-dialog.html">
+    <link rel="import" href="components/core-collapse/core-collapse.html">
 
     <link rel="import" href="order_pricelist.html">
     <link rel="import" href="order_items.html">
     <link rel="import" href="order_customers.html">
- <link rel="import" href="order_customerdialog.html">
+    <link rel="import" href="order_customerdialog.html">
+    <link rel="import" href="order_order.html">
 
 
     <style>
@@ -103,7 +105,7 @@
           <olbapro-customers pricelist="{{pricelist}}" on-save="{{saveCustomer}}" customer="{{customer}}" on-list="{{customerList}}" id="customersElement"></olbapro-customers>                   
         </section>          
         <section class="seccion">
-        Orders
+        <olbapro-orderform></olbapro-orderform>
         </section>          
       </core-animated-pages>
 

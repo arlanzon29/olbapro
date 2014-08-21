@@ -1,20 +1,43 @@
 <polymer-element name="olbapro-items" attributes="item">
 <template >
+  <style>
+   .box {
+      background: #eee;
+    }
+  </style>
   <div vertical layout>
-  	<paper-input label="Item code" id="itemcode" value="{{item.itemcode}}" floatinglabel></paper-input>
-    <paper-input label="Item name" id="itemname" value="{{item.itemname}}" floatinglabel></paper-input>
-    <paper-input label="VAT" id="vat" value="{{item.vat}}" floatinglabel></paper-input>
-    <paper-checkbox label="Inactive" value="{{item.inactive}}"></paper-checkbox>
+    <section style="background: steelblue;">
+      <paper-button label="Master Data" on-click="{{collapseMaster}}"></paper-button>
+      <core-collapse id="colMaster"  class="box" opened >
+        <div class="content" layout vertical>
+
+        	<paper-input label="Item code" id="itemcode" value="{{item.itemcode}}" floatinglabel></paper-input>
+          <paper-input label="Item name" id="itemname" value="{{item.itemname}}" floatinglabel></paper-input>
+          <paper-input label="VAT" id="vat" value="{{item.vat}}" floatinglabel></paper-input>
+          <paper-checkbox label="Inactive" value="{{item.inactive}}"></paper-checkbox>
+        </div>
+      </core-collapse>
+    </section>
     <br>
-    <olbapro-grid id="price" rows="5"  data="{{item.prices}}" selectionmode="none">
-      <olbapro-columns>
-        <olbapro-column id="code" label="Code"  width="60px"  ></olbapro-column>
-        <olbapro-column id="name" label="Name" width="150px"></olbapro-column>
-        <olbapro-column id="price" label="Price" width="100px" updateallowed></olbapro-column>
-      </olbapro-columns>
-    </olbapro-grid> 
+    <section style="background: seagreen;">
+      <paper-button label="Price List" on-click="{{collapsePrice}}"></paper-button>
+        <core-collapse id="colPrice"  class="box" >
+          <br>
+          <olbapro-grid  rows="5"  data="{{item.prices}}" selectionmode="none">
+            <olbapro-columns>
+              <olbapro-column id="code" label="Code"  width="60"  ></olbapro-column>
+              <olbapro-column id="name" label="Name" width="150"></olbapro-column>
+              <olbapro-column id="price" label="Price" width="100" updateallowed></olbapro-column>
+            </olbapro-columns>
+          </olbapro-grid> 
+
+        </core-collapse>
+    </section>
 
   </div>
+      
+
+  </section>
 </template>
 <script>
  Polymer('olbapro-items', {
@@ -22,6 +45,12 @@
     ready: function () {         
    		
        
+    },
+    collapseMaster:function(){
+      this.$.colMaster.toggle();
+    },
+    collapsePrice:function(){
+      this.$.colPrice.toggle();
     }
  });
  </script>
