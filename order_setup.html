@@ -1,0 +1,49 @@
+<polymer-element name="olbapro-setup" attributes="pricelist customers items orders">
+<template>
+	<style>
+		
+	</style>
+
+  <div >
+    <paper-button id="cmdClear" label="Clear Data" raisedButton on-click="{{clearData}}"></paper-button>
+    <br>
+    <paper-button id="cmdPopulate" label="Populate Data" raisedButton on-click="{{populateData}}"></paper-button>
+	
+  </div>
+ 
+</template>
+<script>
+ Polymer('olbapro-setup', {
+    ready: function () {         
+   		
+       
+    },
+    clearData:function(){
+      this.pricelist=[];
+      this.customers=[];
+      this.items=[];
+      this.orders=[];
+    },
+    populateData:function(){
+      this.pricelist=[
+        {"code":"L01","name":"Normal Customer"},
+        {"code":"L02","name":"VIP Customer"},
+        ]
+      this.items=[
+        {"itemcode":"I01","itemname":"My first item","vat":21,"inactive":false,"prices":[
+            {"code":"L01","name":"Normal Customer","price":17},
+            {"code":"L02","name":"VIP Customer","price":16},
+            ]},
+        {"itemcode":"I02","itemname":"My second item","vat":21,"inactive":false,"prices":[
+            {"code":"L01","name":"Normal Customer","price":8},
+            {"code":"L02","name":"VIP Customer","price":7},
+            ]}            
+        ];
+      this.customers=[
+        {"cardcode":"C01","cardname":"Mi primer cliente","pricelist":"L01"},
+        {"cardcode":"C02","cardname":"Mi segundo cliente","pricelist":"L02"}        
+      ];
+    }
+ });
+ </script>
+</polymer-element>

@@ -1,4 +1,4 @@
-<polymer-element name="olbapro-items" attributes="register pricelist mode" >
+<polymer-element name="olbapro-form" attributes="register mode" >
 <template >
   <style>
    .box {
@@ -44,39 +44,7 @@
       background: #eee;
     }
   </style>
-  <div vertical layout>
-    <section style="background: steelblue;">
-      <paper-button label="Master Data" on-click="{{collapseMaster}}"></paper-button>
-      <core-collapse id="colMaster"  class="box" opened >
-        <div class="content" layout vertical>
 
-        	<paper-input label="Item code" id="itemcode" value="{{item.itemcode}}" floatinglabel on-blur="{{validateItem}}"></paper-input>
-          <paper-input label="Item name" id="itemname" value="{{item.itemname}}" floatinglabel on-blur="{{validateItem}}"></paper-input>
-          <paper-input label="VAT" id="vat" value="{{item.vat}}" floatinglabel on-blur="{{validateItem}}"></paper-input>
-          <paper-checkbox label="Inactive" value="{{item.inactive}}" on-blur="{{validateItem}}"></paper-checkbox>
-        </div>
-      </core-collapse>
-    </section>
-    <br>
-    <section style="background: seagreen;">
-      <paper-button label="Price List" on-click="{{collapsePrice}}"></paper-button>
-        <core-collapse id="colPrice"  class="box" >
-          <br>
-          <olbapro-grid  rows="5"  data="{{item.prices}}" selectionmode="none" id="gridPrices">
-            <olbapro-columns>
-              <olbapro-column id="code" label="Code"  width="60"  ></olbapro-column>
-              <olbapro-column id="name" label="Name" width="150"></olbapro-column>
-              <olbapro-column id="price" label="Price" width="100" updateallowed></olbapro-column>
-            </olbapro-columns>
-          </olbapro-grid> 
-
-        </core-collapse>
-    </section>
-
-  </div>
-      
-
-  </section>
 
     <paper-fab icon="expand-more" class="mini" id="cmdMore"  on-click="{{moreButtons}}" ></paper-fab>
     <core-collapse id="colButtons"  class="box"  >
@@ -94,14 +62,29 @@
     </core-collapse>
 </template>
 <script>
- Polymer('olbapro-items', {
-  	item:{"itemcode":"","itemname":"","vat":21,"inactive":false,prices:[]},
-    mode:"",
+ Polymer('olbapro-form', {
+  	mode:"",
+    created:function(){
+      this.olbaproControls=[];
+    },
     ready: function () {  
-      this.item.prices=[];       
-   	  for (var i=0;i<this.pricelist.length;i++){
-        this.item.prices.push({"code":this.pricelist[i].code,"name":this.pricelist[i].name,"price":0})
+      
+     for(var propertyName in this.$) {
+         var ele=this.$[propertyName];
+
+         if (ele.attributes.getNamedItem("olbapro")!=null){
+          this.olbaproControls.push(ele);
+          if (ele.attributes.getNamedItem("key")!=null){
+            this.key=ele.id;
+          }
+          ele.olbaproForm=this;
+          ele.onblur=function(event){
+            this.olbaproForm.validateItem(event)
+          };
+
+         }
       }
+      this.newRecord();
       this.mode="new";
     },
     collapseMaster:function(){
@@ -109,27 +92,6 @@
     },
     collapsePrice:function(){
       this.$.colPrice.toggle();
-    },
-    pricelistChanged:function(){
-      var prices=this.item.prices;
-      this.item.prices=[];       
-      for (var i=0;i<this.pricelist.length;i++){
-        var arr=prices.filter(function(element,pos,arr,value){
-          if (element.code==this){
-            return true;
-          }
-          else{
-            return false;
-          }
-
-        },this.pricelist[i].code);
-
-        var price=0;
-        if (arr.length>0){
-            price=arr[0].price;
-        }
-        this.item.prices.push({"code":this.pricelist[i].code,"name":this.pricelist[i].name,"price":price})
-      }
     },
     moreButtons:function(){
       if (!this.$.colButtons.opened){
@@ -142,14 +104,13 @@
     }
     ,
      saveClick:function(){ 
-     this.$.gridPrices.updateData();
-
+     
       if (this.mode=="update"){
-        for(var propertyName in this.item) {
-           this.register[propertyName]=this.item[propertyName];
+        for(var propertyName in this.currentRecord) {
+           this.register[propertyName]=this.currentRecord[propertyName];
         }
       }else{
-        this.register=this.item;
+        this.register=this.currentRecord;
       }
 
       this.fire("save");
@@ -161,15 +122,20 @@
       this.$.colButtons.opened=false;
         this.$.cmdMore.icon="expand-more";
     },
-    addClick:function(){
-      this.item.itemcode="";
-      this.item.itemname="";
-      this.item.vat="";
-      this.item.prices=[];
+    newRecord:function(){
+      this.register={};
 
-      for (var i=0;i<this.pricelist.length;i++){
-        this.item.prices.push({"code":this.pricelist[i].code,"name":this.pricelist[i].name,"price":0})
+      for (var i=0;i<this.olbaproControls.length;i++){
+        var ele=this.olbaproControls[i];
+       if (ele.attributes.getNamedItem("defaultvalue")!=null){
+          this.register[ele.id]=ele.attributes.getNamedItem("defaultvalue").value;
+       }else{
+          this.register[ele.id]="";
+       }
       }
+    },
+    addClick:function(){
+      this.newRecord();
       this.mode="new";
       this.$.colButtons.opened=false;
         this.$.cmdMore.icon="expand-more";
@@ -185,14 +151,13 @@
         this.addClick();
       }
     },registerChanged:function(){
-      if (this.register.itemcode==""){
+      if (this.register[this.key]==""){
         this.mode="new";
       }else{
         this.mode="ok";
       }
 
-      this.item=JSON.parse(JSON.stringify(this.register));
-      this.pricelistChanged();
+      this.currentRecord=JSON.parse(JSON.stringify(this.register));
     },
     postCommit:function(){
       this.mode="ok";
@@ -201,14 +166,12 @@
       this.addClick();
     },modeChanged:function(){
       if (this.mode=="ok"){
-        this.$.itemcode.readonly=true; 
         this.$.cmdSave.hidden=true;
         this.$.cmdList.hidden=false;   
         this.$.cmdAdd.hidden=false;   
         this.$.cmdDelete.hidden=false;   
         this.$.cmdUndo.hidden=true;   
       }else if (this.mode=="insert"){
-        this.$.itemcode.readonly=false; 
         this.$.cmdSave.hidden=false;  
         this.$.cmdList.hidden=true;
         this.$.cmdAdd.hidden=true;   
@@ -216,7 +179,6 @@
         this.$.cmdUndo.hidden=false;   
       }
       else if (this.mode=="new"){
-        this.$.itemcode.readonly=false; 
         this.$.cmdSave.hidden=true; 
         this.$.cmdList.hidden=false; 
         this.$.cmdAdd.hidden=true;          
@@ -224,13 +186,40 @@
         this.$.cmdUndo.hidden=true;           
       }
       else if (this.mode=="update"){
-        this.$.itemcode.readonly=false; 
         this.$.cmdSave.hidden=false; 
         this.$.cmdList.hidden=true; 
         this.$.cmdAdd.hidden=true;    
         this.$.cmdDelete.hidden=true;  
         this.$.cmdUndo.hidden=false;   
       }
+
+      if (this.mode=="ok" || this.mode=="update"){
+        for (var i=0;i<this.olbaproControls.length;i++){
+          if (this.olbaproControls[i].attributes.getNamedItem("updateallowed")!=null){
+            if (this.olbaproControls[i].attributes.getNamedItem("updateallowed").value=="false"){
+               this.olbaproControls[i].readonly=true;
+             }else{
+              this.olbaproControls[i].readonly=false;
+             }
+           
+          }else{
+            this.olbaproControls[i].readonly=false;
+          }
+        }
+      }else if (this.mode=="new" || this.mode=="insert"){
+        for (var i=0;i<this.olbaproControls.length;i++){
+          if (this.olbaproControls[i].attributes.getNamedItem("insertallowed")!=null){
+            if (this.olbaproControls[i].attributes.getNamedItem("insertallowed").value=="false"){
+             this.olbaproControls[i].readonly=true;
+            }else{
+               this.olbaproControls[i].readonly=false;
+            }
+          }else{
+            this.olbaproControls[i].readonly=false;
+          }
+        }
+      }
+
     },
     validateItem:function(event){
       var changed=false;
@@ -247,6 +236,13 @@
         }else if (this.mode=="new"){
           this.mode="insert";
         }
+      }
+    },
+    dirty:function(){
+     if (this.mode=="ok"){
+        this.mode="update";
+      }else if (this.mode=="new"){
+        this.mode="insert";
       }
     }
 

@@ -1,51 +1,21 @@
-<polymer-element name="olbapro-customers" attributes="customer pricelist">
+<polymer-element name="olbapro-customers" attributes="customer pricelist" extends="olbapro-form">
 <template>
     <style>
-     #cmdMore
-      {
-          position: absolute;
-          right: 20px;
-          top: 10px;
-           background: tomato;
-      }
-    #cmdSave
-      {
-           background: #5677fc;
-      }
-      #cmdDelete
-      {
-         
-           background: #5677fc;
-      }
-      #cmdList
-      {
-          
-           background: #5677fc;
-      }
-      #cmdAdd
-      {
-          
-           background: #5677fc;
-      }
-      #colButtons{
-         position: absolute;
-          right: 20px;
-          top: 60px;
-      }
+    
       .box {
       background: #eee;
     }
   </style>
-  <section style="background: steelblue;">
+  <section style="background: steelblue;" on-blur="{{test}}">
       <paper-button label="Master Data" on-click="{{collapse}}" id="Master"></paper-button>
       <core-collapse id="colMaster"  class="box" opened  >
         <div vertical layout>
-        	<paper-input label="Customer code" id="cardcode" value="{{customer.cardcode}}" floatinglabel></paper-input>
-          <paper-input label="Customer name" id="cardname" value="{{customer.cardname}}" floatinglabel></paper-input>
+        	<paper-input label="Customer code" id="cardcode" value="{{currentRecord.cardcode}}" floatinglabel on-blur="{{validateItem}}" olbapro key updateallowed="false"></paper-input>
+          <paper-input label="Customer name" id="cardname" value="{{currentRecord.cardname}}" floatinglabel on-blur="{{validateItem}}" olbapro ></paper-input>
           <span>Price List</span>
-          <paper-radio-group selected="{{customer.pricelist}}">
+          <paper-radio-group selected="{{currentRecord.pricelist}}" >
       	   <template repeat="{{ value, j in pricelist }}">
-      	    <paper-radio-button label="{{value.name}}" value="{{value.code}}" name="{{value.code}}"></paper-radio-button><br>
+      	    <paper-radio-button label="{{value.name}}" value="{{value.code}}" name="{{value.code}}" olbapro></paper-radio-button><br>
       	   </template>      
           </paper-radio-group>
         </div>
@@ -53,70 +23,20 @@
     </section>
     <br>
     <section style="background: steelblue;">
-      <paper-button label="Address" on-click="{{collapse}}" id="Address"></paper-button>
+      <paper-button label="Address" on-click="{{collapse}}" id="Address" ></paper-button>
       <core-collapse id="colAddress"  class="box" opened  >
-        <paper-input label="Address" multiline maxRows="5" value="{{customer.address}}"  floatinglabel ></paper-input>
+        <paper-input label="Address" multiline maxRows="5" value="{{currentRecord.address}}"  floatinglabel ></on-blur="{{validateItem}}" olbapro > paper-input>
       </core-collapse>
     </section>
-    <paper-fab icon="expand-more" class="mini" id="cmdMore"  on-click="{{moreButtons}}" ></paper-fab>
-    <core-collapse id="colButtons"  class="box"  >
-      <div vertical layout>
-        <paper-fab icon="save" class="mini" id="cmdSave"  on-click="{{save}}" ></paper-fab>
-        <br>
-        <paper-fab icon="delete" class="mini" id="cmdDelete" on-click="{{delete}}" ></paper-fab>
-        <br>
-        <paper-fab icon="list" class="mini" id="cmdList" on-click="{{customerList}}" ></paper-fab>
-        <br>
-        <paper-fab icon="add" class="mini" id="cmdAdd" on-click="{{add}}" ></paper-fab>
-        <br>
-      </div>
-    </core-collapse>
+   <shadow></shadow>
 
     
   </div>
 </template>
 <script>
- Polymer('olbapro-customers', {
-    mode:"insert",
-  	customer:{"cardcode":"","cardname":""},
-    ready: function () {         
-    },
-     save:function(){      
-      this.fire("save");
-      this.mode="update";
-      this.$.colButtons.opened=false;
-        this.$.cmdMore.icon="expand-more";
-    },
-    customerList:function(){      
-      this.fire("list");
-      this.$.colButtons.opened=false;
-        this.$.cmdMore.icon="expand-more";
-    },
-    customerChanged:function(){
-      if (this.customer.cardcode==""){
-        this.mode="insert";
-      }else{
-        this.mode="update";
-      }
-    },add:function(){
-      this.customer.cardcode="";
-      this.customer.cardname="";
-      this.customer.pricelist="";
-      this.mode="insert";
-      this.$.colButtons.opened=false;
-        this.$.cmdMore.icon="expand-more";
-    },collapse:function(event){
+ Polymer('olbapro-customers', {    
+    collapse:function(event){
       this.$["col"+event.currentTarget.id].toggle();
-
-    },
-    moreButtons:function(){
-      if (!this.$.colButtons.opened){
-        this.$.colButtons.opened=true;
-        this.$.cmdMore.icon="expand-less";
-      }else{
-        this.$.colButtons.opened=false;
-        this.$.cmdMore.icon="expand-more";
-      }
     }
 
  });

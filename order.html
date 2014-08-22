@@ -38,12 +38,15 @@
     <link rel="import" href="components/paper-dialog/paper-dialog.html">
     <link rel="import" href="components/core-collapse/core-collapse.html">
 
+<link rel="import" href="olbapro_form.html">
     <link rel="import" href="order_pricelist.html">
     <link rel="import" href="order_items.html">
     <link rel="import" href="order_customers.html">
     <link rel="import" href="order_customerdialog.html">
     <link rel="import" href="order_order.html">
-
+    <link rel="import" href="order_itemdialog.html">
+    <link rel="import" href="order_setup.html">
+  <link rel="import" href="order_orderdialog.html">
 
     <style>
         body {
@@ -72,6 +75,8 @@
     <template>
       <core-localstorage id="pricelist" name="pricelist" value="{{pricelist}}"></core-localstorage>
       <core-localstorage id="customers" name="customers" value="{{customers}}"></core-localstorage>
+      <core-localstorage id="items" name="items" value="{{items}}"></core-localstorage>
+    <core-localstorage id="orders" name="orders" value="{{orders}}"></core-localstorage>
    
   
 
@@ -96,7 +101,7 @@
         Home 
         </section>
         <section class="seccion">
-        Setup
+        <olbapro-setup pricelist="{{pricelist}}" customers="{{customers}}" items="{{items}}" orders="{{orders}}"></obbapro-setpup>
         </section>    
         <section class="seccion">
           <br>
@@ -104,14 +109,14 @@
         </section>
         <section class="seccion">
           <br>
-          <olbapro-items ></olbapro-items>
+          <olbapro-items pricelist="{{pricelist}}" on-save="{{saveItem}}" register="{{item}}" on-list="{{itemList}}" id="itemsElement" on-delete="{{deleteItem}}"></olbapro-items>
         </section>                       
         <section class="seccion">
           <br>
-          <olbapro-customers pricelist="{{pricelist}}" on-save="{{saveCustomer}}" customer="{{customer}}" on-list="{{customerList}}" id="customersElement"></olbapro-customers>                   
+          <olbapro-customers pricelist="{{pricelist}}" on-save="{{saveCustomer}}" register="{{customer}}" on-list="{{customerList}}" id="customersElement"></olbapro-customers>                   
         </section>          
         <section class="seccion">
-        <olbapro-orderform></olbapro-orderform>
+        <olbapro-orderform on-list="{{orderList}}" on-save="{{saveOrder}}" register="{{order}}" id="ordersElement"></olbapro-orderform>
         </section>          
       </core-animated-pages>
 
@@ -119,6 +124,8 @@
 
     </core-scaffold>
     <olbapro-customerdialog id="customerlistdialog" customers="{{customers}}" selectedCustomer="{{customer}}"></olbapro-customerdialog>
+    <olbapro-itemdialog id="itemlistdialog" rows="{{items}}" selectedRow="{{item}}"></olbapro-itemdialog>
+    <olbapro-orderdialog id="orderlistdialog" rows="{{orders}}" selectedRow="{{order}}"></olbapro-itemdialog>
 
         
         
@@ -131,6 +138,8 @@
         created:function(){
           this.pricelist=[];
           this.customers=[];
+          this.items=[];
+          this.orders=[];
         },
         ready: function () {         
           
@@ -182,6 +191,9 @@
         customerList:function(){
           this.$.customerlistdialog.show();
         },
+        orderList:function(){
+          this.$.orderlistdialog.show();
+        },
         moreButtons:function(){
           if (!this.$.colButtons.opened){
             this.$.colButtons.opened=true;
@@ -190,7 +202,40 @@
             this.$.colButtons.opened=false;
             this.$.cmdMore.icon="expand-more";
           }
-        }
+        },
+        saveItem:function(){
+          if ( this.items == "undefined") {
+            this.items=[];
+          }
+  
+          if (this.$.itemsElement.mode=="insert"){
+                this.items.push(this.item);
+          }
+          this.$.items.save();
+          this.$.itemsElement.postCommit();
+        },
+        deleteItem:function(event,item){
+          for (var i=0;i<this.items.length;i++){
+            if (this.items[i].itemcode==item.itemcode){
+              this.items.splice(i,1);
+            }
+          }
+          this.$.items.save();
+          this.$.itemsElement.postDelete();
+
+        },itemList:function(){
+          this.$.itemlistdialog.show();
+        },
+        saveOrder:function(){
+          if ( this.orders == "undefined") {
+            this.orders=[];
+          }
+          if (this.$.ordersElement.mode=="insert"){
+                this.orders.push(this.order);
+          }
+      
+          this.$.orders.save();
+        },
       });
     </script>
   </polymer-element>

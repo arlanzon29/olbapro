@@ -1,0 +1,49 @@
+<polymer-element name="olbapro-orderdialog" attributes="rows selectedRow">
+<template>
+<style type="text/css">
+    paper-dialog {
+      width: 460px;
+      height: 450px;
+    }
+    #cmdSelect
+      {
+          position: absolute;
+          right: 20px;
+          top: 20px;
+           background: #5677fc;
+      }
+</style>
+
+  <paper-dialog  heading="Orders List" id="dialog">
+    <br>
+     <olbapro-grid id="grid" rows="10" data="{{rows}}" readonly="true" selectionmode="single">
+      <olbapro-columns>
+        <olbapro-column id="number" label="Code"  width="60"  ></olbapro-column>
+        <olbapro-column id="cardcode" label="Customer" width="80" ></olbapro-column>
+        <olbapro-column id="cardname" label="Name" width="200" ></olbapro-column>
+        
+      </olbapro-columns>
+    </olbapro-grid> 
+    <br>
+    <paper-fab icon="done" class="mini" id="cmdSelect"  on-click="{{select}}" ></paper-fab>
+
+  </paper-dialog>
+
+</template>
+<script>
+ Polymer('olbapro-orderdialog', {
+
+    ready: function () {         
+   		
+       
+    },
+    show:function(){
+      this.$.dialog.opened=true;
+    },
+    select:function(){
+      this.selectedRow=this.rows[this.$.grid.getSelectedRows()[0]];
+      this.$.dialog.opened=false;
+    }
+ });
+ </script>
+</polymer-element>
