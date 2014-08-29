@@ -20,8 +20,8 @@
 	<br>
 <olbapro-grid id="grid" rows="10" data="{{filterData}}" insertallowed selectionmode="multiple">
     <olbapro-columns>
-      <olbapro-column id="code" label="Code"  width="60"  ></olbapro-column>
-      <olbapro-column id="name" label="Name" width="250" updateallowed></olbapro-column>
+      <olbapro-column id="code" label="Code"  width="60"  on-validate="{{validateCode}}"></olbapro-column>
+      <olbapro-column id="name" label="Name" width="250"  updateallowed></olbapro-column>
     </olbapro-columns>
   </olbapro-grid> 
 <paper-fab icon="save" class="mini" id="cmdSave"  on-click="{{save}}" ></paper-fab>
@@ -52,16 +52,21 @@
     },
     delete:function(){
     	this.$.grid.deleteSelectedRows();    	
-    },
+    },  
     validateFilter:function(){
-          this.filterData=this.pricelist.filter(function(element,index,arr,value){
-              if (element.code.indexOf(this)!=-1 || element.name.indexOf(this)!=-1){
-                return true;
-              }else{
-                return false;
-              }
-          },this.filtervalue);
-        },
+      this.filterData=this.pricelist.filter(function(element,index,arr,value){
+          if (element.code.indexOf(this)!=-1 || element.name.indexOf(this)!=-1){
+            return true;
+          }else{
+            return false;
+          }
+      },this.filtervalue);
+    },
+    validateCode:function(event,obj){
+      alert("Validar");
+    }
+
+   
  });
  </script>
 </polymer-element>

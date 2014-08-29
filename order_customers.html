@@ -1,17 +1,30 @@
-<polymer-element name="olbapro-customers" attributes="customer pricelist" extends="olbapro-form">
+<polymer-element name="olbapro-customers" attributes="customer pricelist customers" extends="olbapro-form">
 <template>
     <style>
     
       .box {
       background: #eee;
     }
+    #errorIcon {
+  background-image: url(error-100.png);
+  background-size: 24px 24px;
+  height: 24px;
+  width: 24px;
+}
+#errorContainer {
+  visibility: true;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+}
   </style>
   <section style="background: steelblue;" on-blur="{{test}}">
       <paper-button label="Master Data" on-click="{{collapse}}" id="Master"></paper-button>
       <core-collapse id="colMaster"  class="box" opened  >
         <div vertical layout>
-        	<paper-input label="Customer code" id="cardcode" value="{{currentRecord.cardcode}}" floatinglabel on-blur="{{validateItem}}" olbapro key updateallowed="false"></paper-input>
-          <paper-input label="Customer name" id="cardname" value="{{currentRecord.cardname}}" floatinglabel on-blur="{{validateItem}}" olbapro ></paper-input>
+        	<paper-input label="Customer code" id="cardcode" value="{{currentRecord.cardcode}}" floatinglabel  olbapro key updateallowed="false" on-validate="{{cardcodeValidate}}" mandatory></paper-input>
+          <paper-input label="Customer name" id="cardname" value="{{currentRecord.cardname}}" floatinglabel  olbapro mandatory></paper-input>
           <span>Price List</span>
           <paper-radio-group selected="{{currentRecord.pricelist}}" >
       	   <template repeat="{{ value, j in pricelist }}">
@@ -25,9 +38,13 @@
     <section style="background: steelblue;">
       <paper-button label="Address" on-click="{{collapse}}" id="Address" ></paper-button>
       <core-collapse id="colAddress"  class="box" opened  >
-        <paper-input label="Address" multiline maxRows="5" value="{{currentRecord.address}}"  floatinglabel ></on-blur="{{validateItem}}" olbapro > paper-input>
+        <paper-input label="Address" multiline maxRows="5" value="{{currentRecord.address}}"  floatinglabel olbapro ><paper-input>
       </core-collapse>
     </section>
+     <div id="errorContainer">
+      <div id="error" role="alert" aria-hidden="{{false}}" style="color:#d34336">Mi error</div>
+      <div id="errorIcon"></div>
+    </div>
    <shadow></shadow>
 
     
@@ -37,6 +54,16 @@
  Polymer('olbapro-customers', {    
     collapse:function(event){
       this.$["col"+event.currentTarget.id].toggle();
+    },
+    cardcodeValidate:function(event){
+      for (var i=0;i<this.customers.length;i++){
+        if (this.currentRecord.cardcode==this.customers[i].cardcode){
+          this.$.cardcode.error="Ya existe un cliente con este codigo";
+          this.$.cardcode.invalid=true;
+          return false;
+        }
+      }
+      this.$.cardcode.invalid=false;
     }
 
  });

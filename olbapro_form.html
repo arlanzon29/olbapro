@@ -104,6 +104,14 @@
     }
     ,
      saveClick:function(){ 
+
+      for (var i=0;i<this.olbaproControls.length;i++){
+        if (this.olbaproControls[i].invalid){
+          alert("Existen campos con errores")
+          this.olbaproControls[i].focus();
+          return false;
+        }
+      }
      
       if (this.mode=="update"){
         for(var propertyName in this.currentRecord) {
@@ -127,11 +135,16 @@
 
       for (var i=0;i<this.olbaproControls.length;i++){
         var ele=this.olbaproControls[i];
-       if (ele.attributes.getNamedItem("defaultvalue")!=null){
-          this.register[ele.id]=ele.attributes.getNamedItem("defaultvalue").value;
-       }else{
-          this.register[ele.id]="";
-       }
+         if (ele.attributes.getNamedItem("defaultvalue")!=null){
+            this.register[ele.id]=ele.attributes.getNamedItem("defaultvalue").value;
+         }else{
+            this.register[ele.id]="";
+         }
+          if (ele.attributes.getNamedItem("mandatory")!=null){
+            ele.error="Debe indicar un valor obligatoriamente";
+            ele.invalid=true;
+          }
+
       }
     },
     addClick:function(){
@@ -155,6 +168,11 @@
         this.mode="new";
       }else{
         this.mode="ok";
+
+        for (var i=0;i<this.olbaproControls.length;i++){
+          this.olbaproControls[i].error="";
+          this.olbaproControls[i].invalid=false;
+        }
       }
 
       this.currentRecord=JSON.parse(JSON.stringify(this.register));
@@ -230,13 +248,22 @@
         changed=true;  
       }
 
+
       if (changed){
+        this.$[event.currentTarget.id].fire("validate");
+
+        
         if (this.mode=="ok"){
           this.mode="update";
         }else if (this.mode=="new"){
           this.mode="insert";
         }
       }
+
+       if (event.currentTarget.value=="" && event.currentTarget.attributes.getNamedItem("mandatory")!=null){
+          event.currentTarget.error="Debe indicar un valor para este campo";
+          event.currentTarget.invalid=true;
+        }
     },
     dirty:function(){
      if (this.mode=="ok"){

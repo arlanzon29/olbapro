@@ -73,9 +73,9 @@
 
   <polymer-element name="olbapro-order">
     <template>
-      <core-localstorage id="pricelist" name="pricelist" value="{{pricelist}}"></core-localstorage>
-      <core-localstorage id="customers" name="customers" value="{{customers}}"></core-localstorage>
-      <core-localstorage id="items" name="items" value="{{items}}"></core-localstorage>
+    <core-localstorage id="pricelist" name="pricelist" value="{{pricelist}}"></core-localstorage>
+    <core-localstorage id="customers" name="customers" value="{{customers}}"></core-localstorage>
+    <core-localstorage id="items" name="items" value="{{items}}"></core-localstorage>
     <core-localstorage id="orders" name="orders" value="{{orders}}"></core-localstorage>
    
   
@@ -113,7 +113,7 @@
         </section>                       
         <section class="seccion">
           <br>
-          <olbapro-customers pricelist="{{pricelist}}" on-save="{{saveCustomer}}" register="{{customer}}" on-list="{{customerList}}" id="customersElement"></olbapro-customers>                   
+          <olbapro-customers pricelist="{{pricelist}}" on-save="{{saveCustomer}}" register="{{customer}}" customers="{{customers}}" on-list="{{customerList}}" id="customersElement"></olbapro-customers>                   
         </section>          
         <section class="seccion">
         <olbapro-orderform on-list="{{orderList}}" on-save="{{saveOrder}}" register="{{order}}" id="ordersElement"></olbapro-orderform>
