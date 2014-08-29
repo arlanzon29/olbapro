@@ -98,6 +98,8 @@ Polymer('olbapro-grid', {
     var totalWidth=24+5+2; /* width +padding+border */
     for (var i=0;i<columns.children.length;i++){      
       this.columns.push({"id":columns.children[i].id,"label":columns.children[i].label,"control":columns.children[i]})
+
+      columns.children[i].grid=this;
       var span=this.$.headerDiv.appendChild(document.createElement("span"));
       span.id="header"+columns.children[i].id;
       span.innerHTML =columns.children[i].label;
@@ -238,14 +240,14 @@ refreshData:function(){
         ctr.value=ele[this.columns[j].id].value;
         ctr.disabled=false;
 
-        if (ele.opg_status=="ok"){
+        if (ele.status=="ok"){
           if (!this.columns[j].control.updateallowed || this.readonly){
             ctr.readonly=true;
           }else{
             ctr.readonly=false;
           }
           this.shadowRoot.querySelector("#pos"+pad(i,3)).value=this.firstRow+i+1;
-        }else if (ele.opg_status=="new"){
+        }else if (ele.status=="new"){
           if (!this.columns[j].control.insertallowed || this.readonly){
             ctr.readonly=true;
           }else{
@@ -284,8 +286,8 @@ blur:function(event){
   if (this.firstRow+pos<=this.dataSource.length){ /* No es el registro de insert */
     if (value!=this.dataSource[this.firstRow+pos][colum].value){
        var obj={
-        "column":colum,
-        "row":this.firstRow+pos,
+        "column":this.getColumnByName(colum),
+        "currentRow":this.dataSource[this.firstRow+pos],
         "value":value,
         "control":this.shadowRoot.querySelector("#"+event.currentTarget.id)
       };
@@ -308,10 +310,10 @@ blur:function(event){
         
       }
 
-      if ( this.dataSource[this.firstRow+pos].opg_status=="ok"){
-        this.dataSource[this.firstRow+pos].opg_status="update"
-      }else if ( this.dataSource[this.firstRow+pos].opg_status=="new"){
-        this.dataSource[this.firstRow+pos].opg_status="insert"
+      if ( this.dataSource[this.firstRow+pos].status=="ok"){
+        this.dataSource[this.firstRow+pos].status="update"
+      }else if ( this.dataSource[this.firstRow+pos].status=="new"){
+        this.dataSource[this.firstRow+pos].status="insert"
 
         if (this.insertAllowed){
           var obj={};
@@ -319,9 +321,9 @@ blur:function(event){
             var newObj={"invalid":false,"error":"","oldValue":"","value":""};
             obj[this.columns[j].id]=newObj;
           }
-          obj.opg_position=-1;
-          obj.opg_status="new";
-          obj.opq_selected=false;
+          obj.position=this.dataSource.length;
+          obj.status="new";
+          obj.selected=false;
           this.dataSource.push(obj);
           this.refreshData();
         }
@@ -380,9 +382,9 @@ dataChanged:function(){
         var newObj={"invalid":false,"error":"","oldValue":this.data[i][this.columns[j].id],"value":this.data[i][this.columns[j].id]};
         obj[this.columns[j].id]=newObj;
       }
-      obj.opg_position=i;
-      obj.opg_status="ok";
-      obj.opq_selected=false;
+      obj.position=i;
+      obj.status="ok";
+      obj.selected=false;
       this.dataSource.push(obj);
     }
 
@@ -392,9 +394,9 @@ dataChanged:function(){
         var newObj={"invalid":false,"error":"","oldValue":"","value":""};
         obj[this.columns[j].id]=newObj;
       }
-      obj.opg_position=-1;
-      obj.opg_status="new";
-      obj.opq_selected=false;
+      obj.position=this.dataSource.length;
+      obj.status="new";
+      obj.selected=false;
       this.dataSource.push(obj);
     }
 
@@ -441,7 +443,7 @@ paintRow:function(row){
     if (this.dataSource[row+this.firstRow].opq_selected){
       selected=true;
     }
-   if (this.dataSource[row+this.firstRow].opg_status=="deleted"){
+   if (this.dataSource[row+this.firstRow].status=="deleted"){
       deleted=true;
     }
 
@@ -519,7 +521,7 @@ paintData:function(){
 },
 clickHeader:function(event){
   var column=event.currentTarget.id.substring(6);
-this.hiddeColumn(column);
+
   if (this.lastSortColumn==column){
     this.dataSource.reverse(this.sortFunction(column));
     this.lastSortColumn="";
@@ -572,8 +574,8 @@ getSelectedRows:function(){
 deleteSelectedRows:function(){
    for (var i=0;i<this.dataSource.length;i++){
     if (this.dataSource[i].opq_selected){
-      this.dataSource[i].opq_selected=false;
-      this.dataSource[i].opg_status="deleted";
+      this.dataSource[i].selected=false;
+      this.dataSource[i].status="deleted";
       this.paintData();
     }
   }
@@ -582,7 +584,7 @@ getDeleteRows:function(){
   var arr=[];
 
   for (var i=0;i<this.dataSource.length;i++){
-    if (this.dataSource[i].opg_status=="deleted"){
+    if (this.dataSource[i].status=="deleted"){
       arr.push(i);
     }
   }
@@ -594,12 +596,12 @@ updateData:function(){
   for (var i=0;i<this.dataSource.length;i++){
     var newObj=this.dataSource[i];
 
-    if (newObj.opg_status=="update"){
-      var olbObj=this.data[newObj.opg_position];
+    if (newObj.status=="update"){
+      var olbObj=this.data[newObj.position];
       for (var j=0;j<this.columns.length;j++){
         olbObj[this.columns[j].id]=newObj[this.columns[j].id].value;
       }
-    }else if (newObj.opg_status=="add"){
+    }else if (newObj.status=="add"){
       var oldObj={};
       for (var j=0;j<this.columns.length;j++){
         oldObj[this.columns[j].id]=newObj[this.columns[j].id].value;
@@ -614,10 +616,14 @@ updateData:function(){
   for (var i=this.dataSource.length-1;i>=0;i--){
      var newObj=this.dataSource[i];
 
-    if (newObj.opg_status=="deleted" && newObj.opg_position!=-1){
-      this.data.splice(newObj.opg_position,1);
+    if (newObj.status=="deleted" && newObj.position!=-1){
+      this.data.splice(newObj.position,1);
     }
   }
+},
+setValue:function(column,row,value){
+  this.dataSource[row][column].value=value;
+   
 }
 
 });
@@ -633,7 +639,11 @@ updateData:function(){
       ready:function(){
       },
       updateallowed:true,
-      insertallowed:true
+      insertallowed:true,
+      setValue:function(row,value){
+    
+        this.grid.setValue(this.id,row,value);
+      }
 
     });
   </script>
