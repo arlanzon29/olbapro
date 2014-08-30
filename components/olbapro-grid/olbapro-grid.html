@@ -193,6 +193,7 @@ Polymer('olbapro-grid', {
         if (this.setFirstRow(this.firstRow+1)){ /* try to change first row */
           this.refreshData();  /*Refresh data */
           this.paintData();
+          this.controlData();
           this.$.slider.value=this.firstRow+1;
 
         }  
@@ -209,6 +210,7 @@ Polymer('olbapro-grid', {
       if (this.setFirstRow(this.firstRow-1)){ /* Change first row */
         this.refreshData(); /* Refresh Data */
         this.paintData();
+        this.controlData();
         this.$.slider.value=this.firstRow+1;
       }
     }
@@ -227,46 +229,74 @@ focus:function(event){
     this.currentRow=pos;
 
     this.paintRow(pos);
-    this.paintRow(r);    
+    this.paintRow(r);  
+
+  }
+},
+refreshDataCell:function(visualRow,columnName){
+  var ctr=this.shadowRoot.querySelector("#"+columnName+pad(visualRow,3));
+
+  if (visualRow+this.firstRow<this.dataSource.length){
+    ctr.value=this.dataSource[visualRow+this.firstRow][columnName].value;
+  }else{
+    ctr.value="";
+  }
+  
+},
+refreshDataPosCell:function(visualRow){
+  if (visualRow+this.firstRow<this.dataSource.length){
+    if (this.dataSource[visualRow+this.firstRow].status=="new" || this.dataSource[visualRow+this.firstRow].status=="insert"){
+      this.shadowRoot.querySelector("#pos"+pad(visualRow,3)).value="*";
+    }else{
+      this.shadowRoot.querySelector("#pos"+pad(visualRow,3)).value=this.dataSource[visualRow+this.firstRow].position; 
+    }
+  }else{
+    this.shadowRoot.querySelector("#pos"+pad(visualRow,3)).value=""; 
+  }
+},
+refreshDataRow:function(visualRow){
+  this.refreshDataPosCell(visualRow);
+  for (var j=0;j<this.columns.length;j++){
+    this.refreshDataCell(visualRow,this.columns[j].id)
   }
 },
 refreshData:function(){
   for (var i=0;i<this.rows;i++){
-    if (i+this.firstRow<this.dataSource.length){
-      var ele=this.dataSource[this.firstRow+i];
-      for (var j=0;j<this.columns.length;j++){
-        var ctr=this.shadowRoot.querySelector("#"+this.columns[j].id+pad(i,3));
+    this.refreshDataRow(i);
+  }
+},
+controlCell:function(visualRow,columnName){
+  var ctr=this.shadowRoot.querySelector("#"+columnName+pad(visualRow,3));
 
-        ctr.value=ele[this.columns[j].id].value;
-        ctr.disabled=false;
-
-        if (ele.status=="ok"){
-          if (!this.columns[j].control.updateallowed || this.readonly){
-            ctr.readonly=true;
-          }else{
-            ctr.readonly=false;
-          }
-          this.shadowRoot.querySelector("#pos"+pad(i,3)).value=this.firstRow+i+1;
-        }else if (ele.status=="new"){
-          if (!this.columns[j].control.insertallowed || this.readonly){
-            ctr.readonly=true;
-          }else{
-            ctr.readonly=false;
-          }
-          this.shadowRoot.querySelector("#pos"+pad(i,3)).value="*";
-        }
-        
-      }  
-      
-    }else{
-      for (var j=0;j<this.columns.length;j++){
-        var ctr=this.shadowRoot.querySelector("#"+this.columns[j].id+pad(i,3))
-        ctr.value=""; 
-        ctr.readonly=true;      
-        ctr.disabled=true;
-      }      
-      this.shadowRoot.querySelector("#pos"+pad(i,3)).value=""; 
-    }
+  if (visualRow+this.firstRow<this.dataSource.length){
+    var column=this.getColumnByName(columnName)
+    ctr.disabled=false;
+    if (this.dataSource[visualRow+this.firstRow].status=="ok" || this.dataSource[visualRow+this.firstRow].status=="update"){
+      if (this.readOnly ||  !column.control.updateallowed){
+        ctr.readonly=true;
+      }else{
+        ctr.readonly=false;
+      }
+    }else if (this.dataSource[visualRow+this.firstRow].status=="new" || this.dataSource[visualRow+this.firstRow].status=="insert"){
+      if (this.readOnly || !column.control.insertallowed){
+        ctr.readonly=true;
+      }else{
+        ctr.readonly=false;
+      }
+    } 
+  }else{
+    ctr.disabled=true;
+    ctr.readonly=true;
+  }
+},
+controlRow:function(visualRow){
+for (var j=0;j<this.columns.length;j++){
+    this.controlCell(visualRow,this.columns[j].id)
+  }
+},
+controlData:function(){
+for (var i=0;i<this.rows;i++){
+    this.controlRow(i);
   }
 },
 getColumnByName:function(name){
@@ -285,26 +315,25 @@ blur:function(event){
 
   if (this.firstRow+pos<=this.dataSource.length){ /* No es el registro de insert */
     if (value!=this.dataSource[this.firstRow+pos][colum].value){
+      var source=this.dataSource[this.firstRow+pos][colum];
        var obj={
         "column":this.getColumnByName(colum),
         "currentRow":this.dataSource[this.firstRow+pos],
         "value":value,
         "control":this.shadowRoot.querySelector("#"+event.currentTarget.id)
       };
-      this.dataSource[this.firstRow+pos][colum].value=value;
+      source.value=value;
 
-
-      obj.control.invalid=false;
+      source.invalid=false;
+      source.error="";
 
       this.getColumnByName(colum).control.fire("validate",obj);
-
-
       this.fire("validatecell",obj);
 
       
 
-      if (obj.control.invalid){
-        obj.control.style.background="red";
+      if (source.invalid){
+        obj.control.style.background="#E60026";
       }else{
         obj.control.style.background="lightgreen";
         
@@ -326,6 +355,7 @@ blur:function(event){
           obj.selected=false;
           this.dataSource.push(obj);
           this.refreshData();
+          this.controlData();
         }
       }
     }else{
@@ -355,6 +385,7 @@ changeSlider:function(){
   if (this.setFirstRow(this.$.slider.value-1)){
     this.refreshData();
     this.paintData();
+    this.controlData();
   }else{
 
   }
@@ -365,11 +396,13 @@ setMaxSlider:function(){
 readonlyChanged:function(){
   this.refreshData();
   this.paintData();
+  this.controlData();
   this.setMaxSlider();
 },
 insertAllowedChanged:function(){
   this.refreshData();
   this.paintData();
+  this.controlData();
   this.setMaxSlider();
 },
 dataChanged:function(){
@@ -406,6 +439,7 @@ dataChanged:function(){
     
 
     this.paintData();
+    this.controlData();
     this.setMaxSlider();
     this.$.slider.value=1;
 
@@ -416,17 +450,17 @@ clickPosition:function(event){
     var pos=parseInt(right(event.currentTarget.id,3));
     if (pos+this.firstRow<this.dataSource.length){
       if (this.selectionmode=="multiple"){
-       this.dataSource[pos+this.firstRow].opq_selected=!this.dataSource[pos+this.firstRow].opq_selected; 
+       this.dataSource[pos+this.firstRow].selected=!this.dataSource[pos+this.firstRow].selected; 
      }else{ /*single */
       for (var i=0;i<this.dataSource.length;i++){
-        this.dataSource[i].opq_selected=false;
+        this.dataSource[i].selected=false;
       }
-      this.dataSource[pos+this.firstRow].opq_selected=true; 
+      this.dataSource[pos+this.firstRow].selected=true; 
      }
       
 
       this.paintData();
-     if (this.dataSource[pos+this.firstRow].opq_selected){
+     if (this.dataSource[pos+this.firstRow].selected){
       var obj={"data":this.dataSource[pos+this.firstRow],"position":pos+this.firstRow}
          this.fire("selectedrow",obj);
 
@@ -434,85 +468,81 @@ clickPosition:function(event){
     }
   }  
 },
-paintRow:function(row){
-  if (row+this.firstRow<this.dataSource.length){
+paintCell:function(visualRow,columnName){
+    var column=this.getColumnByName(columnName);
+
+  if (visualRow+this.firstRow<this.dataSource.length){
     var selected=false;
     var deleted=false;
 
 
-    if (this.dataSource[row+this.firstRow].opq_selected){
+    if (this.dataSource[visualRow+this.firstRow].selected){
       selected=true;
     }
-   if (this.dataSource[row+this.firstRow].status=="deleted"){
+    if (this.dataSource[visualRow+this.firstRow].status=="deleted"){
       deleted=true;
     }
 
-    for (var j=0;j<this.columns.length;j++){     
-      if (selected) {
-        this.shadowRoot.querySelector("#"+this.columns[j].id+pad(row,3)).style.background="orange";
-      }else if(deleted){
-        this.shadowRoot.querySelector("#"+this.columns[j].id+pad(row,3)).style.background="red";
-      }else{
-       if (this.currentRow==row){
-        this.shadowRoot.querySelector("#"+this.columns[j].id+pad(row,3)).style.background="lightgreen";
-       }else{
-        if ((this.firstRow+row)%2==1){
-this.shadowRoot.querySelector("#"+this.columns[j].id+pad(row,3)).style.background="lightblue";
-        }else{
-          this.shadowRoot.querySelector("#"+this.columns[j].id+pad(row,3)).style.background="white";
-        }
-        
-       }
-      }
-    }
 
-    if (selected){
-       this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="orange";
+    if (selected) {
+      this.shadowRoot.querySelector("#"+column.id+pad(visualRow,3)).style.background="orange";
     }else if(deleted){
-        this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="red";
+      this.shadowRoot.querySelector("#"+column.id+pad(visualRow,3)).style.background="red";
     }else{
-      if (this.currentRow==row){
-          this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="lightgreen";
+     if (this.currentRow==visualRow){
+      this.shadowRoot.querySelector("#"+column.id+pad(visualRow,3)).style.background="lightgreen";
+     }else{
+      if ((this.firstRow+visualRow)%2==1){
+        this.shadowRoot.querySelector("#"+column.id+pad(visualRow,3)).style.background="lightblue";
       }else{
-        if ((this.firstRow+row)%2==1){
-          this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="lightblue";
-        }else{
-          this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="white";
-        }
-        }
+        this.shadowRoot.querySelector("#"+column.id+pad(visualRow,3)).style.background="white";
+      }
+     }
     }
   }else{
-    if (row+this.firstRow==this.dataSource.length && this.insertAllowed && !this.readonly ){
-    
-      for (var j=0;j<this.columns.length;j++){
-        if (this.currentRow==row){
-          this.shadowRoot.querySelector("#"+this.columns[j].id+pad(row,3)).style.background="lightgreen";
-        } else{
-          if ((this.firstRow+row)%2==1){
-            this.shadowRoot.querySelector("#"+this.columns[j].id+pad(row,3)).style.background="lightblue";
-          }else{
-          this.shadowRoot.querySelector("#"+this.columns[j].id+pad(row,3)).style.background="white";
-          } 
+    if (visualRow!=0){
+    this.shadowRoot.querySelector("#"+column.id+pad(visualRow,3)).style.background="white";
+}
+  }
+},
+paintPosCell:function(visualRow){
+  if (visualRow+this.firstRow<this.dataSource.length){
+    var selected=false;
+    var deleted=false;
+
+
+    if (this.dataSource[visualRow+this.firstRow].selected){
+      selected=true;
+    }
+    if (this.dataSource[visualRow+this.firstRow].status=="deleted"){
+      deleted=true;
+    }
+
+   
+    if (selected){
+       this.shadowRoot.querySelector("#pos"+pad(visualRow,3)).style.background="orange";
+    }else if(deleted){
+        this.shadowRoot.querySelector("#pos"+pad(visualRow,3)).style.background="red";
+    }else{
+      if (this.currentRow==visualRow){
+        this.shadowRoot.querySelector("#pos"+pad(visualRow,3)).style.background="lightgreen";
+      }else{
+        if ((this.firstRow+visualRow)%2==1){
+          this.shadowRoot.querySelector("#pos"+pad(visualRow,3)).style.background="lightblue";
+        }else{
+          this.shadowRoot.querySelector("#pos"+pad(visualRow,3)).style.background="white";
         }
       }
-      if (this.currentRow==row){
-        this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="lightgreen";
-      }else{
-        if ((this.firstRow+row)%2==1){
-            this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="lightblue";
-          }else{
-          this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="white";
-          } 
-      }
-    }else{  /* No es la linea de insercion nueva */
-      for (var j=0;j<this.columns.length;j++){
-        this.shadowRoot.querySelector("#"+this.columns[j].id+pad(row,3)).style.background="white";
-      }
-      this.shadowRoot.querySelector("#pos"+pad(row,3)).style.background="white";
     }
-    
+  }else{  /* No es la linea de insercion nueva */
+    this.shadowRoot.querySelector("#pos"+pad(visualRow,3)).style.background="white";
   }
- 
+},
+paintRow:function(visualRow){
+  this.paintPosCell(visualRow);
+ for (var j=0;j<this.columns.length;j++){     
+    this.paintCell(visualRow,this.columns[j].id);
+  }
 },
 paintData:function(){
   for (var i=0;i<this.rows;i++){
@@ -533,11 +563,12 @@ clickHeader:function(event){
 
  
   for (var i=0;i<this.dataSource.length;i++){
-    this.dataSource[i].opq_selected=false;
+    this.dataSource[i].selected=false;
   }
   if (this.setFirstRow(0)){
     this.refreshData();
     this.paintData();
+    this.controlData();
   }
 
 },
@@ -564,7 +595,7 @@ getSelectedRows:function(){
   var arr=[];
 
   for (var i=0;i<this.dataSource.length;i++){
-    if (this.dataSource[i].opq_selected){
+    if (this.dataSource[i].selected){
       arr.push(i);
     }
   }
@@ -573,10 +604,11 @@ getSelectedRows:function(){
 },
 deleteSelectedRows:function(){
    for (var i=0;i<this.dataSource.length;i++){
-    if (this.dataSource[i].opq_selected){
+    if (this.dataSource[i].selected){
       this.dataSource[i].selected=false;
       this.dataSource[i].status="deleted";
       this.paintData();
+      this.controlData();
     }
   }
 },

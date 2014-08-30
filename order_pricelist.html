@@ -20,7 +20,7 @@
 	<br>
 <olbapro-grid id="grid" rows="10" data="{{filterData}}" insertallowed selectionmode="multiple">
     <olbapro-columns>
-      <olbapro-column id="code" label="Code"  width="60"  on-validate="{{validateCode}}"></olbapro-column>
+      <olbapro-column id="code" label="Code"  width="60"  on-validate="{{validateCode}}" updateallowed=false></olbapro-column>
       <olbapro-column id="name" label="Name" width="250"  updateallowed></olbapro-column>
     </olbapro-columns>
   </olbapro-grid> 
@@ -62,8 +62,16 @@
           }
       },this.filtervalue);
     },
-    validateCode:function(event,obj){
-      this.$.name.setValue(obj.currentRow.position,"Prueba");
+    validateCode:function(event,eventExt){
+      for (var i=0;i<this.pricelist.length;i++){
+        if (this.pricelist[i].code==eventExt.value){
+          eventExt.currentRow.code.invalid=true;
+          eventExt.currentRow.code.error="Existe un elemento con el mismo código";
+          
+          alert("Código existente");
+        }
+      }
+      
     }
 
    
