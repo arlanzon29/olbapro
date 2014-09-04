@@ -42,12 +42,14 @@
 		}
     },
     save:function(){
-      this.$.grid.updateData();
+      var obj={};
+      obj.update=this.$.grid.getUpdateRows();
+      obj.insert=this.$.grid.getInsertRows();
     	/*var deleteRows=this.$.grid.getDeleteRows(); 
     	for (var i=deleteRows.length-1;i>=0;i--){
     		this.pricelist.splice(this.filterData[deleteRows[i]].position, 1);
     	}*/
-    	this.fire("save");
+    	this.fire("save",obj);
     	this.filterData=this.pricelist;
     },
     delete:function(){

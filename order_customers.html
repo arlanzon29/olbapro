@@ -23,7 +23,7 @@
       <paper-button label="Master Data" on-click="{{collapse}}" id="Master"></paper-button>
       <core-collapse id="colMaster"  class="box" opened  >
         <div vertical layout>
-        	<paper-input label="Customer code" id="cardcode" value="{{currentRecord.cardcode}}" floatinglabel  olbapro key updateallowed="false" on-validate="{{cardcodeValidate}}" mandatory></paper-input>
+        	<paper-input label="Customer code" id="cardcode" value="{{currentRecord.cardcode}}" floatinglabel  olbapro key updateallowed="true" on-validate="{{cardcodeValidate}}" mandatory></paper-input>
           <paper-input label="Customer name" id="cardname" value="{{currentRecord.cardname}}" floatinglabel  olbapro mandatory></paper-input>
           <span>Price List</span>
           <paper-radio-group selected="{{currentRecord.pricelist}}" >

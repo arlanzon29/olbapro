@@ -1,0 +1,42 @@
+<polymer-element name="olbapro-firebasesingle" attributes="url data key">
+<template >
+ 
+</template>
+<script>
+ Polymer('olbapro-firebasesingle', {
+    url:"",
+    myFirebaseRef:null,
+    data:{},
+    ready:function(){
+      
+    },
+    keyChanged:function(){
+      if (this.key==""){
+         this.myFirebaseRef = new Firebase(this.url);
+        this.data={};
+      }else{
+        this.myFirebaseRef = new Firebase(this.url+'/'+this.key);
+
+        this.myFirebaseRef.on("value", this.readData,this);
+      }
+
+      /*this.myFirebaseRef.push({"code":"L01","name":"Normal List"});
+      this.myFirebaseRef.push({"code":"L012","name":"VIP List"});*/
+
+    },
+    readData:function(snapshot){
+      this.data=snapshot.val();
+
+    },
+    saveData:function(){
+      if (this.key==""){
+          var newItem=this.myFirebaseRef.push(this.data);
+           this.key=newItem.name();
+        }else{
+          this.myFirebaseRef.set(this.data);
+        }           
+    }
+
+ });
+ </script>
+</polymer-element>

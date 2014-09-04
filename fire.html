@@ -1,0 +1,48 @@
+<html>
+
+ <script src="components/firebase/firebase.js"></script>
+<body>
+	test
+
+<script>
+    var myFirebaseRef = new Firebase("https://blazing-fire-9906.firebaseio.com/test");
+
+    /*myFirebaseRef.set({
+	    title: "Hello World!",
+	    author: "Firebase",
+	    location: {
+	    city: "San Francisco",
+	    state: "California",
+	    zip: 94103
+	    },
+	    directions:[
+	    	{"city":"Burgos"},
+	    	{"City":"Burgos"}
+	    ]
+    });
+
+     var myFirebaseRef2 = new Firebase("https://blazing-fire-9906.firebaseio.com/test2");
+
+        myFirebaseRef2.push({
+	    title: "Hello World!2",
+	    author: "Firebase",
+	    location: {
+	    city: "San Francisco",
+	    state: "California",
+	    zip: 94103
+	    },
+	    directions:[
+	    	{"city":"Burgos"},
+	    	{"City":"Burgos"}
+	    ]
+    });*/
+
+	var myFirebaseRef2 = new Firebase("https://blazing-fire-9906.firebaseio.com/test2");
+	 myFirebaseRef2.on("value", function(snapshot) {
+    alert(snapshot.val()); // Alerts "San Francisco"
+    });
+
+
+</script>
+</body>
+</html>

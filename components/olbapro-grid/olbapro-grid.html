@@ -623,6 +623,41 @@ getDeleteRows:function(){
 
   return arr;
 },
+getUpdateRows:function(){
+  var arr=[];
+
+  for (var i=0;i<this.dataSource.length;i++){
+    if (this.dataSource[i].status=="update"){
+      var newObj=this.dataSource[i];
+
+      var olbObj=this.data[newObj.position];
+      for (var j=0;j<this.columns.length;j++){
+        olbObj[this.columns[j].id]=newObj[this.columns[j].id].value;
+      }
+
+      arr.push(olbObj);
+    }
+  }
+
+  return arr;
+},
+getInsertRows:function(){
+  var arr=[];
+
+  for (var i=0;i<this.dataSource.length;i++){
+    if (this.dataSource[i].status=="insert"){
+      var newObj=this.dataSource[i];
+
+      var oldObj={};
+      for (var j=0;j<this.columns.length;j++){
+        oldObj[this.columns[j].id]=newObj[this.columns[j].id].value;
+      }
+      arr.push(oldObj);
+    }
+  }
+
+  return arr;
+},
 updateData:function(){
   /* Inserts and updates */
   for (var i=0;i<this.dataSource.length;i++){

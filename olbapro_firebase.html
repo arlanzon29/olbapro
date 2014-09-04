@@ -1,0 +1,67 @@
+<polymer-element name="olbapro-firebase" attributes="url data ">
+<template >
+ 
+</template>
+<script>
+ Polymer('olbapro-firebase', {
+    url:"",
+    myFirebaseRef:null,
+    data:{},
+    ready:function(){
+      
+    },
+    urlChanged:function(){
+      this.myFirebaseRef = new Firebase(this.url);
+
+      this.myFirebaseRef.on("value", this.readList,this);
+
+      /*this.myFirebaseRef.push({"code":"L01","name":"Normal List"});
+      this.myFirebaseRef.push({"code":"L012","name":"VIP List"});*/
+
+    },
+    readList:function(snapshot){
+      var lst=snapshot.val();
+
+      var arr=[];
+
+      for(var propertyName in lst) {
+        lst[propertyName].firebaseId=propertyName;
+        arr.push(lst[propertyName])
+
+      }
+      this.data=arr;
+    },
+    saveData:function(data){
+      if (data instanceof Array){
+        for (var i=0;i<data.length;i++){
+          if (data[i].firebaseId==null){
+            this.myFirebaseRef.push(data[i]);
+          }else{
+            var id=data[i].firebaseId;
+            var ref = new Firebase(this.url+"/"+data[i].firebaseId);
+            data[i].firebaseId=null;
+            ref.set(data[i]);
+            data[i].firebaseId=id;
+          }
+        }
+
+      }else{
+        if (data.firebaseId==null){
+          this.myFirebaseRef.push(data);
+        }else{
+          var id=data.firebaseId;
+          var ref = new Firebase(this.url+"/"+data.firebaseId);
+          data.firebaseId=null;
+          ref.set(data);
+          data.firebaseId=id;
+        }
+      }
+
+
+      
+       
+    }
+
+ });
+ </script>
+</polymer-element>

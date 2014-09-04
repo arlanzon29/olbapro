@@ -1,4 +1,4 @@
-<polymer-element name="olbapro-form" attributes="register mode" >
+<polymer-element name="olbapro-form" attributes="register mode key" >
 <template >
   <style>
    .box {
@@ -148,7 +148,8 @@
       }
     },
     addClick:function(){
-      this.newRecord();
+      this.key="";
+      /*this.newRecord();*/
       this.mode="new";
       this.$.colButtons.opened=false;
         this.$.cmdMore.icon="expand-more";
