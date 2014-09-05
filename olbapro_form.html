@@ -1,4 +1,4 @@
-<polymer-element name="olbapro-form" attributes="register mode key" >
+<polymer-element name="olbapro-form" attributes="register mode key save" >
 <template >
   <style>
    .box {
@@ -121,6 +121,7 @@
         this.register=this.currentRecord;
       }
 
+      this.save=true;
       this.fire("save");
       this.$.colButtons.opened=false;
       this.$.cmdMore.icon="expand-more";

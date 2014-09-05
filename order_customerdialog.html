@@ -13,10 +13,12 @@
            background: #5677fc;
       }
 </style>
+    <olbapro-filterarray source="{{customers}}" filter="{{filter}}" data="{{filteredCustomer}}"></olbapro-filterarray>
 
   <paper-dialog  heading="Customers List" id="dialog">
+    <paper-input value="{{filter}}" label="Filter"></paper-input>
     <br>
-     <olbapro-grid id="grid" rows="10" data="{{customers}}" readonly="true" selectionmode="single">
+     <olbapro-grid id="grid" rows="8" data="{{filteredCustomer}}" readonly="true" selectionmode="single">
       <olbapro-columns>
         <olbapro-column id="cardcode" label="Code"  width="60"  ></olbapro-column>
         <olbapro-column id="cardname" label="Name" width="210" updateallowed></olbapro-column>
@@ -41,6 +43,7 @@
     select:function(){
       this.selectedCustomer=this.customers[this.$.grid.getSelectedRows()[0]].firebaseId;
       this.$.dialog.opened=false;
+      this.fire("select",this.customers[this.$.grid.getSelectedRows()[0]])
     }
  });
  </script>

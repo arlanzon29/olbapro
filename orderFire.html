@@ -48,7 +48,9 @@
     <link rel="import" href="order_setup.html">
     <link rel="import" href="order_orderdialog.html">
     <link rel="import" href="olbapro_firebase.html">
-       <link rel="import" href="olbapro_firebasesingle.html">
+    <link rel="import" href="olbapro_firebasesingle.html">
+    <link rel="import" href="olbapro_filterarray.html">
+
     <script src="components/firebase/firebase.js"></script>
 
     <style>
@@ -78,11 +80,13 @@
     <template>
     <olbapro-firebase id="dataPriceList" url="{{url+'/pricelist'}}" data="{{pricelist}}"></olbapro-firebase>
     <olbapro-firebase id="customers" url="{{url+'/customer'}}" data="{{customers}}"></olbapro-firebase>
-    <olbapro-firebasesingle id="customerData" url="{{url+'/customer'}}" data="{{customer}}" key="{{keyCustomer}}"></olbapro-firebasesingle>
+    <olbapro-firebasesingle id="customerData" url="{{url+'/customer'}}" data="{{customer}}" key="{{keyCustomer}}" save="{{saveCustomer}}"></olbapro-firebasesingle>
+
     
-  
+    <olbapro-firebase id="dataOrders" url="{{url+'/order'}}" data="{{orderRows}}"></olbapro-firebase>
+     <olbapro-firebasesingle id="dataOrder" url="{{url+'/order'}}" data="{{order}}" key="{{keyOrder}}" save="{{saveOrder}}"></olbapro-firebasesingle>
+
     <core-localstorage id="items" name="items" value="{{items}}"></core-localstorage>
-    <core-localstorage id="orders" name="orders" value="{{orders}}"></core-localstorage>
    
   
 
@@ -119,20 +123,20 @@
         </section>                       
         <section class="seccion">
           <br>
-          <olbapro-customers pricelist="{{pricelist}}" on-save="{{saveCustomer}}" register="{{customer}}" customers="{{customers}}" on-list="{{customerList}}" key="{{keyCustomer}}" id="customersElement"></olbapro-customers>                   
+          <olbapro-customers pricelist="{{pricelist}}" save="{{saveCustomer}}" register="{{customer}}" customers="{{customers}}" selectedCustomer="{{keyCustomer}}" id="customersElement"></olbapro-customers>                   
         </section>          
         <section class="seccion">
-        <olbapro-orderform on-list="{{orderList}}" on-save="{{saveOrder}}" register="{{order}}" id="ordersElement"></olbapro-orderform>
+        <olbapro-orderform  register="{{order}}" rows="{{orderRows}}" selectedRowId="{{keyOrder}}" customers="{{customers}}" selectedCustomer="{{keyCustomer}}" save="{{saveOrder}}" id="ordersElement"></olbapro-orderform>
+
         </section>          
       </core-animated-pages>
 
 
 
     </core-scaffold>
-    <olbapro-customerdialog id="customerlistdialog" customers="{{customers}}" selectedCustomer="{{keyCustomer}}"></olbapro-customerdialog>
-    <olbapro-itemdialog id="itemlistdialog" rows="{{items}}" selectedRow="{{item}}"></olbapro-itemdialog>
-    <olbapro-orderdialog id="orderlistdialog" rows="{{orders}}" selectedRow="{{order}}"></olbapro-itemdialog>
 
+    <olbapro-itemdialog id="itemlistdialog" rows="{{items}}" selectedRow="{{item}}"></olbapro-itemdialog>
+   
         
         
     </template>
@@ -186,20 +190,6 @@
           this.$.dataPriceList.saveData(obj.update);
           this.$.dataPriceList.saveData(obj.insert);   
         },
-        saveCustomer:function(){
-          this.$.customerData.saveData();
-          /*if ( this.customers == "undefined") {
-            this.customers=[];
-          }
-          if (this.$.customersElement.mode=="insert"){
-                this.customers.push(this.customer);
-          }
-      
-          this.$.customers.save();*/
-        },
-        customerList:function(){
-          this.$.customerlistdialog.show();
-        },
         orderList:function(){
           this.$.orderlistdialog.show();
         },
@@ -234,17 +224,7 @@
 
         },itemList:function(){
           this.$.itemlistdialog.show();
-        },
-        saveOrder:function(){
-          if ( this.orders == "undefined") {
-            this.orders=[];
-          }
-          if (this.$.ordersElement.mode=="insert"){
-                this.orders.push(this.order);
-          }
-      
-          this.$.orders.save();
-        },
+        }
       });
     </script>
   </polymer-element>

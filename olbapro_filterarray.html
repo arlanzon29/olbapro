@@ -1,0 +1,32 @@
+<polymer-element name="olbapro-filterarray" attributes="source filter data">
+<template >
+ 
+</template>
+<script>
+ Polymer('olbapro-filterarray', {
+   
+    ready:function(){
+      
+    },
+    sourceChanged:function(){
+      this.executeFilter();
+    },
+    filterChanged:function(){
+      this.executeFilter();
+    },
+    executeFilter:function(){
+       this.data=this.source.filter(function(element){
+          for(var propertyName in element) {
+             if (element[propertyName].indexOf(this)!=-1){
+              return true;
+             }
+          }
+
+          return false;
+        
+      },this.filter);
+
+    }
+ });
+ </script>
+</polymer-element>

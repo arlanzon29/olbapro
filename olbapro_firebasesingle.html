@@ -1,4 +1,4 @@
-<polymer-element name="olbapro-firebasesingle" attributes="url data key">
+<polymer-element name="olbapro-firebasesingle" attributes="url data key save">
 <template >
  
 </template>
@@ -7,8 +7,11 @@
     url:"",
     myFirebaseRef:null,
     data:{},
+    save:false,
+    key:"",
     ready:function(){
-      
+      this.myFirebaseRef = new Firebase(this.url);
+      this.data={};
     },
     keyChanged:function(){
       if (this.key==""){
@@ -23,6 +26,12 @@
       /*this.myFirebaseRef.push({"code":"L01","name":"Normal List"});
       this.myFirebaseRef.push({"code":"L012","name":"VIP List"});*/
 
+    },
+    saveChanged:function(){
+      if (this.save){
+        this.saveData();
+        this.save=false;
+      }
     },
     readData:function(snapshot){
       this.data=snapshot.val();

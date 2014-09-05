@@ -1,23 +1,11 @@
-<polymer-element name="olbapro-customers" attributes="customer pricelist customers" extends="olbapro-form">
+<polymer-element name="olbapro-customers" attributes="customer pricelist customers selectedCustomer" extends="olbapro-form">
 <template>
     <style>
     
       .box {
       background: #eee;
     }
-    #errorIcon {
-  background-image: url(error-100.png);
-  background-size: 24px 24px;
-  height: 24px;
-  width: 24px;
-}
-#errorContainer {
-  visibility: true;
-  display: -webkit-flex;
-  display: flex;
-  -webkit-align-items: center;
-  align-items: center;
-}
+  
   </style>
   <section style="background: steelblue;" on-blur="{{test}}">
       <paper-button label="Master Data" on-click="{{collapse}}" id="Master"></paper-button>
@@ -41,10 +29,8 @@
         <paper-input label="Address" multiline maxRows="5" value="{{currentRecord.address}}"  floatinglabel olbapro ><paper-input>
       </core-collapse>
     </section>
-     <div id="errorContainer">
-      <div id="error" role="alert" aria-hidden="{{false}}" style="color:#d34336">Mi error</div>
-      <div id="errorIcon"></div>
-    </div>
+
+    <olbapro-customerdialog id="customerlistdialog" customers="{{customers}}" selectedCustomer="{{selectedCustomer}}" ></olbapro-customerdialog>
    <shadow></shadow>
 
     
@@ -64,6 +50,9 @@
         }
       }
       this.$.cardcode.invalid=false;
+    },
+    listClick:function(){
+      this.$.customerlistdialog.show();
     }
 
  });
