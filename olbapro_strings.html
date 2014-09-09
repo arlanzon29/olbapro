@@ -1,0 +1,22 @@
+<polymer-element name="olbapro-strings" attributes="language strings">
+<template>
+</template>
+<script>
+ Polymer('olbapro-strings', {
+    language:"en",
+    ready: function () {     
+      this.languageChanged();
+    },
+    languageChanged:function(){
+      var  obj={};
+      for (var i=0;i<this.children.length;i++){
+        var node=this.children[i];
+        obj[node.id]=node.attributes.getNamedItem(this.language).value
+        
+      }
+       this.strings=obj;
+    }
+ });
+ </script>
+
+</polymer-element>

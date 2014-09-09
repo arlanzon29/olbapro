@@ -38,7 +38,8 @@
     <link rel="import" href="components/paper-dialog/paper-dialog.html">
     <link rel="import" href="components/core-collapse/core-collapse.html">
 
-<link rel="import" href="olbapro_form.html">
+    <link rel="import" href="olbapro_form.html">
+    <link rel="import" href="olbapro_strings.html">
     <link rel="import" href="order_pricelist.html">
     <link rel="import" href="order_items.html">
     <link rel="import" href="order_customers.html">
@@ -46,7 +47,7 @@
     <link rel="import" href="order_order.html">
     <link rel="import" href="order_itemdialog.html">
     <link rel="import" href="order_setup.html">
-  <link rel="import" href="order_orderdialog.html">
+    <link rel="import" href="order_orderdialog.html">
 
     <style>
         body {
@@ -78,7 +79,14 @@
     <core-localstorage id="items" name="items" value="{{items}}"></core-localstorage>
     <core-localstorage id="orders" name="orders" value="{{orders}}"></core-localstorage>
    
-  
+    <olbapro-strings language="es">
+      <string id="Home" es="Inicio" en="Home"></string>
+      <string id="Setup" es="Configurar" en="Setup"></string>
+      <string id="PriceList" es="Lista Precios" en="Price List"></string>
+      <string id="Items" es="Artículos" en="Items"></string>
+      <string id="Customers" es="Clientes" en="Customers"></string>
+      <string id="Orders" es="Pedidos" en="Orders"></string>      
+    </olbapro-strings>
 
      <core-scaffold id="scaffold">
       <core-header-panel mode="seamed" id="core_header_panel" navigation flex>

@@ -1,4 +1,4 @@
-<polymer-element name="olbapro-pricelist" attributes="pricelist">
+<polymer-element name="olbapro-pricelist" attributes="pricelist language">
 <template>
 	<style>
 		#cmdSave
@@ -16,12 +16,19 @@
 	         background: #5677fc;
 	    }
 	</style>
-	<paper-input label="Filter" id="Filter" value="{{filtervalue}}" on-change="{{validateFilter}}"></paper-input>
+     <olbapro-strings language="{{language}}" strings="{{strings}}">
+      <string id="Filter" es="Filtrado" en="Filter"></string>
+      <string id="Code" es="Codigo" en="Code"></string>
+      <string id="Name" es="Nombre" en="Name"></string>
+      <string id="ErrorSameCode" es="Hay un elemento con el mismo código" en="There is an element with the same code"></string>     
+    </olbapro-strings>
+
+	<paper-input label="{{strings.Filter}}" id="Filter" value="{{filtervalue}}" on-change="{{validateFilter}}"></paper-input>
 	<br>
 <olbapro-grid id="grid" rows="10" data="{{filterData}}" insertallowed selectionmode="multiple">
     <olbapro-columns>
-      <olbapro-column id="code" label="Code"  width="60"  on-validate="{{validateCode}}" updateallowed=false></olbapro-column>
-      <olbapro-column id="name" label="Name" width="250"  updateallowed></olbapro-column>
+      <olbapro-column id="code" label="{{strings.Code}}"  width="60"  on-validate="{{validateCode}}" updateallowed=false></olbapro-column>
+      <olbapro-column id="name" label="{{strings.Name}}" width="250"  updateallowed></olbapro-column>
     </olbapro-columns>
   </olbapro-grid> 
 <paper-fab icon="save" class="mini" id="cmdSave"  on-click="{{save}}" ></paper-fab>
@@ -68,7 +75,7 @@
       for (var i=0;i<this.pricelist.length;i++){
         if (this.pricelist[i].code==eventExt.value){
           eventExt.currentRow.code.invalid=true;
-          eventExt.currentRow.code.error="Existe un elemento con el mismo código";
+          eventExt.currentRow.code.error=this.strings.ErrorSameCode;
           
           alert("Código existente");
         }

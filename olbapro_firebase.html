@@ -1,4 +1,4 @@
-<polymer-element name="olbapro-firebase" attributes="url data ">
+<polymer-element name="olbapro-firebase" attributes="url path data ">
 <template >
  
 </template>
@@ -11,7 +11,7 @@
       
     },
     urlChanged:function(){
-      this.myFirebaseRef = new Firebase(this.url);
+      this.myFirebaseRef = new Firebase(this.url+this.path);
 
       this.myFirebaseRef.on("value", this.readList,this);
 
@@ -38,7 +38,7 @@
             this.myFirebaseRef.push(data[i]);
           }else{
             var id=data[i].firebaseId;
-            var ref = new Firebase(this.url+"/"+data[i].firebaseId);
+            var ref = new Firebase(this.url+this.path+"/"+data[i].firebaseId);
             data[i].firebaseId=null;
             ref.set(data[i]);
             data[i].firebaseId=id;
@@ -50,7 +50,7 @@
           this.myFirebaseRef.push(data);
         }else{
           var id=data.firebaseId;
-          var ref = new Firebase(this.url+"/"+data.firebaseId);
+          var ref = new Firebase(this.url+this.path+"/"+data.firebaseId);
           data.firebaseId=null;
           ref.set(data);
           data.firebaseId=id;

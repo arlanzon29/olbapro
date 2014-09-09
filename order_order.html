@@ -1,4 +1,4 @@
-<polymer-element name="olbapro-orderform"  attributes="rows selectedRowId customers selectedCustomer customer" extends="olbapro-form">
+<polymer-element name="olbapro-orderform"  attributes="rows selectedRowId customers selectedCustomer customer language" extends="olbapro-form">
 <template >
   <style>
    .box {
@@ -21,32 +21,43 @@
     #divCustomer{
     }
   </style>
+   <olbapro-strings language="{{language}}" strings="{{strings}}">
+      <string id="MasterData" es="Datos Maestros" en="Master Data"></string>
+      <string id="Customer" es="Cliente" en="Customer"></string>
+      <string id="CustomerName" es="Razón" en="Name"></string>
+      <string id="Address" es="Direccion" en="Address"></string>  
+      <string id="Reference" es="Su Referencia" en="Reference"></string>     
+      <string id="OrderNumber" es="Numero Pedido" en="Order Number"></string>  
+      <string id="DocDate" es="Fecha Doc." en="Doc. Date"></string> 
+      <string id="ShipDate" es="Fecha Entre." en="Ship Date"></string>  
+    </olbapro-strings>
+
     <section style="background: steelblue;">
-      <paper-button label="Master Data" on-click="{{collapse}}" id="Master"></paper-button>
+      <paper-button label="{{strings.MasterData}}" on-click="{{collapse}}" id="Master"></paper-button>
       <core-collapse id="colMaster"  class="box" opened  >
         <div horizontal layout>
          <div vertical layout id="divCustomer" style="width:50%">
             <div horizontal layout>
-              <paper-input label="Customer" id="cardcode" class="smalltext" floatinglabel value="{{currentRecord.cardcode}}" olbapro mandatory on-validate="{{cardcodeValidate}}"></paper-input>
+              <paper-input label="{{strings.Customer}}" id="cardcode" class="smalltext" floatinglabel value="{{currentRecord.cardcode}}" olbapro mandatory on-validate="{{cardcodeValidate}}"></paper-input>
               
               <core-icon class="clsimage" on-click="{{clickSearchCustomer}}" icon="search"></core-icon>
             </div>
-            <paper-input label="Name" id="cardname" class="smalltext" value="{{currentRecord.cardname}}" floatinglabel olbapro></paper-input>
-            <paper-input label="Reference" id="reference" class="smalltext" value="{{currentRecord.reference}}" floatinglabel olbapro></paper-input>
+            <paper-input label="{{strings.CustomerName}}" id="cardname" class="smalltext" value="{{currentRecord.cardname}}" floatinglabel olbapro></paper-input>
+            <paper-input label="{{strings.Reference}}" id="reference" class="smalltext" value="{{currentRecord.reference}}" floatinglabel olbapro></paper-input>
           </div>
           <div vertical layout style="width:50%">
-            <paper-input label="Order number" id="number" class="smalltext" value="{{currentRecord.number}}" floatinglabel olbapro key></paper-input>
-            <paper-input label="Doc. date" id="date" class="smalltext" value="{{currentRecord.date}}" floatinglabel olbapro> </paper-input>
-            <paper-input label="Ship date" id="shipdate" class="smalltext" value="{{currentRecord.shipdate}}" floatinglabel olbapro></paper-input>
+            <paper-input label="{{strings.OrderNumber}}" id="number" class="smalltext" value="{{currentRecord.number}}" floatinglabel olbapro key></paper-input>
+            <paper-input label="{{strings.DocDate}}" id="date" class="smalltext" value="{{currentRecord.date}}" floatinglabel olbapro> </paper-input>
+            <paper-input label="{{strings.ShipDate}}" id="shipdate" class="smalltext" value="{{currentRecord.shipdate}}" floatinglabel olbapro></paper-input>
           </div>
         <div>
       </core-collapse>
     </section>
     <br>
     <section style="background: steelblue;">
-      <paper-button label="Address" on-click="{{collapse}}" id="Address"></paper-button>
+      <paper-button label="{{strings.Address}}" on-click="{{collapse}}" id="Address"></paper-button>
       <core-collapse id="colAddress"  class="box" opened  >
-        <paper-input label="Address" id="address" multiline maxRows="5" value="{{currentRecord.address}}"  floatinglabel olbapro ></paper-input>
+        <paper-input label="{{strings.Address}}" id="address" multiline maxRows="5" value="{{currentRecord.address}}"  floatinglabel olbapro ></paper-input>
 
       </core-collapse>
     </section>

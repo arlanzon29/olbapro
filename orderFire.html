@@ -50,6 +50,7 @@
     <link rel="import" href="olbapro_firebase.html">
     <link rel="import" href="olbapro_firebasesingle.html">
     <link rel="import" href="olbapro_filterarray.html">
+    <link rel="import" href="olbapro_strings.html">
 
     <script src="components/firebase/firebase.js"></script>
 
@@ -78,44 +79,54 @@
 
   <polymer-element name="olbapro-order">
     <template>
-    <olbapro-firebase id="dataPriceList" url="{{url+'/pricelist'}}" data="{{pricelist}}"></olbapro-firebase>
-    <olbapro-firebase id="customers" url="{{url+'/customer'}}" data="{{customers}}"></olbapro-firebase>
-    <olbapro-firebasesingle id="customerData" url="{{url+'/customer'}}" data="{{customer}}" key="{{keyCustomer}}" save="{{saveCustomer}}"></olbapro-firebasesingle>
+    <olbapro-firebase id="dataPriceList" url="{{config.databaseUrl}}" path="/pricelist" data="{{pricelist}}"></olbapro-firebase>
+    <olbapro-firebase id="customers" url="{{config.databaseUrl}}" path="/customer" data="{{customers}}"></olbapro-firebase>
+    <olbapro-firebasesingle id="customerData" url="{{config.databaseUrl}}" path="/customer}}" data="{{customer}}" key="{{keyCustomer}}" save="{{saveCustomer}}"></olbapro-firebasesingle>
 
     
-    <olbapro-firebase id="dataOrders" url="{{url+'/order'}}" data="{{orderRows}}"></olbapro-firebase>
-     <olbapro-firebasesingle id="dataOrder" url="{{url+'/order'}}" data="{{order}}" key="{{keyOrder}}" save="{{saveOrder}}"></olbapro-firebasesingle>
+    <olbapro-firebase id="dataOrders" url="{{config.databaseUrl}}" url="/order" data="{{orderRows}}"></olbapro-firebase>
+     <olbapro-firebasesingle id="dataOrder" url="{{config.databaseUrl}}" path="/order" data="{{order}}" key="{{keyOrder}}" save="{{saveOrder}}"></olbapro-firebasesingle>
 
     <core-localstorage id="items" name="items" value="{{items}}"></core-localstorage>
+    <core-localstorage id="configOrderFire" name="configOrderFire" value="{{config}}"></core-localstorage>
    
   
+   <olbapro-strings language="{{config.language}}" strings="{{strings}}">
+      <string id="Home" es="Inicio" en="Home"></string>
+      <string id="Setup" es="Configurar" en="Setup"></string>
+      <string id="PriceList" es="Lista Precios" en="Price List"></string>
+      <string id="Items" es="Articulos" en="Items"></string>
+      <string id="Customers" es="Clientes" en="Customers"></string>
+      <string id="Orders" es="Pedidos" en="Orders"></string>                  
+    </olbapro-strings>
 
      <core-scaffold id="scaffold">
       <core-header-panel mode="seamed" id="core_header_panel" navigation flex>
         <core-toolbar id="core_toolbar"></core-toolbar>
         <core-menu id="core_menu" valueattr="label" theme="core-light-theme">
-          <core-item id="cmdHome" icon="settings" label="Home" horizontal center layout on-click="{{menuClick}}"></core-item>
-          <core-item id="cmdSetup" icon="settings" label="Setup" horizontal center layout on-click="{{menuClick}}"></core-item>
-          <core-item id="cmdPriceList" icon="settings" label="Price List" horizontal center layout on-click="{{menuClick}}"></core-item>
-          <core-item id="cmdItems" icon="settings" label="Items" horizontal center layout on-click="{{menuClick}}"></core-item>
-          <core-item id="cmdCustomers" icon="settings" label="Customers" horizontal center layout on-click="{{menuClick}}"></core-item>
-          <core-item id="cmdOrder" icon="settings" label="Orders" horizontal center layout on-click="{{menuClick}}"></core-item>          
+          <core-item id="cmdHome" icon="settings" label="{{strings.Home}}" horizontal center layout on-click="{{menuClick}}"></core-item>
+          <core-item id="cmdSetup" icon="settings" label="{{strings.Setup}}" horizontal center layout on-click="{{menuClick}}"></core-item>
+          <core-item id="cmdPriceList" icon="settings" label="{{strings.PriceList}}" horizontal center layout on-click="{{menuClick}}"></core-item>
+          <core-item id="cmdItems" icon="settings" label="{{strings.Items}}" horizontal center layout on-click="{{menuClick}}"></core-item>
+          <core-item id="cmdCustomers" icon="settings" label="{{strings.Customers}}" horizontal center layout on-click="{{menuClick}}"></core-item>
+          <core-item id="cmdOrder" icon="settings" label="{{strings.Orders}}" horizontal center layout on-click="{{menuClick}}"></core-item>          
         </core-menu>
       </core-header-panel>
       <div id="div" tool>
-        <span id="title">Home </span> 
+        <span>{{mainTitle}}</span> 
        </div>
     </core-collapse></div>
       <core-animated-pages  selected="{{core_selected}}" selectedindex="0" notap id="core_animated_pages" >
         <section class="seccion">
-        Home 
+        {{string.Home}} 
         </section>
         <section class="seccion">
-        <olbapro-setup pricelist="{{pricelist}}" customers="{{customers}}" items="{{items}}" orders="{{orders}}"></obbapro-setpup>
+        <olbapro-setup pricelist="{{pricelist}}" customers="{{customers}}" items="{{items}}" orders="{{orders}}"
+        language="{{config.language}}" strings="{{strings}}" config="{{config}}"></obbapro-setpup>
         </section>    
         <section class="seccion">
           <br>
-          <olbapro-pricelist pricelist="{{pricelist}}" on-save="{{savePriceList}}"></olbapro-pricelist>
+          <olbapro-pricelist pricelist="{{pricelist}}" on-save="{{savePriceList}}" language="{{config.language}}"></olbapro-pricelist>
         </section>
         <section class="seccion">
           <br>
@@ -123,10 +134,10 @@
         </section>                       
         <section class="seccion">
           <br>
-          <olbapro-customers pricelist="{{pricelist}}" save="{{saveCustomer}}" register="{{customer}}" customers="{{customers}}" selectedCustomer="{{keyCustomer}}" id="customersElement"></olbapro-customers>                   
+          <olbapro-customers pricelist="{{pricelist}}" save="{{saveCustomer}}" register="{{customer}}" customers="{{customers}}" selectedCustomer="{{keyCustomer}}" id="customersElement" language="{{config.language}}"></olbapro-customers>                   
         </section>          
         <section class="seccion">
-        <olbapro-orderform  register="{{order}}" rows="{{orderRows}}" selectedRowId="{{keyOrder}}" customers="{{customers}}" selectedCustomer="{{keyCustomer}}" save="{{saveOrder}}" id="ordersElement"></olbapro-orderform>
+        <olbapro-orderform  register="{{order}}" rows="{{orderRows}}" selectedRowId="{{keyOrder}}" customers="{{customers}}" selectedCustomer="{{keyCustomer}}" save="{{saveOrder}}" id="ordersElement" language="{{config.language}}"></olbapro-orderform>
 
         </section>          
       </core-animated-pages>
@@ -143,44 +154,78 @@
 
     <script>
       
-      Polymer('olbapro-order', {
-        url:"https://blazing-fire-9906.firebaseio.com/database",
+      Polymer('olbapro-order', {       
         keyCustomer:"",
+        config:null,
         created:function(){
           this.pricelist=[];
           this.customers=[];
           this.items=[];
-          this.orders=[];
+          this.orders=[]; 
+
         },
         ready: function () {         
-          
+          this.mainTitle=this.strings.Home
+
+           this.$.configOrderFire.load();
+          if (this.config==null){
+            this.config=     {"language":"en","database":"test","databaseUrl":"https://blazing-fire-9906.firebaseio.com/database",
+          "databases":[{"name":"test","url":"https://blazing-fire-9906.firebaseio.com/database"},
+                      {"name":"test2","url":"https://blazing-fire-9906.firebaseio.com/database2"}]}
+                      }    
         },
+        stringsChanged:function(){
+           this.changeTitle();
+
+            this.$.configOrderFire.save();
+
+        },
+        changeTitle:function(){
+          switch(this.core_selected){
+            case 0:
+             this.mainTitle =this.strings.Home;
+             break;
+            case 1:
+             this.mainTitle =this.strings.Setup;
+             break;
+            case 2:
+             this.mainTitle =this.strings.PriceList;
+             break;
+            case 3:
+             this.mainTitle =this.strings.Items;
+             break;
+            case 4:
+             this.mainTitle =this.strings.Customers;
+             break;   
+            case 5:
+             this.mainTitle =this.strings.Orders;
+             break;
+          }
+        },
+        core_selectedChanged:function(){
+          this.changeTitle();
+        },
+
         menuClick:function(event,a,b){
           switch(event.currentTarget.id){
             case "cmdHome":
-              this.core_selected=0;
-               this.$.title.innerHTML ="Home";
+              this.core_selected=0;          
               break;
             case "cmdSetup":
               this.core_selected=1;
-               this.$.title.innerHTML ="Setup";
 
               break; 
             case "cmdPriceList":
               this.core_selected=2;
-              this.$.title.innerHTML ="Price List";
               break;   
             case "cmdItems":
               this.core_selected=3;
-               this.$.title.innerHTML ="Items";
               break; 
             case "cmdCustomers":
               this.core_selected=4;
-               this.$.title.innerHTML ="Customers";
               break; 
             case "cmdOrder":
               this.core_selected=5;
-               this.$.title.innerHTML ="Orders";
               break;                             
           }
           this.$.scaffold.closeDrawer();

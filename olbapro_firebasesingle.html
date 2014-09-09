@@ -1,4 +1,4 @@
-<polymer-element name="olbapro-firebasesingle" attributes="url data key save">
+<polymer-element name="olbapro-firebasesingle" attributes="url path data key save">
 <template >
  
 </template>
@@ -10,15 +10,18 @@
     save:false,
     key:"",
     ready:function(){
-      this.myFirebaseRef = new Firebase(this.url);
+      
       this.data={};
+    },
+    urlChanged:function(){
+      this.myFirebaseRef = new Firebase(this.url+this.path);
     },
     keyChanged:function(){
       if (this.key==""){
-         this.myFirebaseRef = new Firebase(this.url);
+         this.myFirebaseRef = new Firebase(this.url+this.path);
         this.data={};
       }else{
-        this.myFirebaseRef = new Firebase(this.url+'/'+this.key);
+        this.myFirebaseRef = new Firebase(this.url+this.path+'/'+this.key);
 
         this.myFirebaseRef.on("value", this.readData,this);
       }

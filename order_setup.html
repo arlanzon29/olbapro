@@ -1,21 +1,56 @@
-<polymer-element name="olbapro-setup" attributes="pricelist customers items orders">
+<polymer-element name="olbapro-setup" attributes="pricelist customers items orders language config">
 <template>
 	<style>
 		
 	</style>
 
   <div >
-    <paper-button id="cmdClear" label="Clear Data" raisedButton on-click="{{clearData}}"></paper-button>
+    <olbapro-strings language="{{language}}" strings="{{strings}}"> 
+     <string id="AddNew" es="Nueva" en="Add New"></string>   
+      
+      <string id="ClearData" es="Limpiar Datos" en="Clear Data"></string>   
+      <string id="PopulateData" es="Rellenar Datos" en="Populate Data"></string>     
+      <string id="ChooseYourDatabase" es="Escoja base de datos" en="Choose your database"></string>            
+       <string id="ChooseYourLanguage" es="Escoja un idioma" en="Choose your language"></string>   
+     
+    </olbapro-strings>
+
+    <span>{{strings.ChooseYourLanguage}}</span><br>
+    <paper-radio-group selected="{{language}}"  >
+         <paper-radio-button label="Español" value="es" name="es" ></paper-radio-button><br>   
+         <paper-radio-button label="English" value="en" name="en" ></paper-radio-button>  
+    </paper-radio-group>
     <br>
-    <paper-button id="cmdPopulate" label="Populate Data" raisedButton on-click="{{populateData}}"></paper-button>
-	
+    <span>{{strings.ChooseYourDatabase}}</span><br>
+    <paper-radio-group selected="{{config.databaseName}}" on-core-select="{{changeDatabase}}" >
+     <template repeat="{{ value, j in config.databases }}">
+      <paper-radio-button label="{{value.name}}" value="{{value.name}}" name="{{value.name}}" ></paper-radio-button><br>
+     </template>      
+    </paper-radio-group>
+    <br>
+
+    <paper-button id="cmdNew" label="{{strings.AddNew}}" raisedButton on-click="{{addNew}}"></paper-button>
+    <br>
+    <paper-button id="cmdClear" label="{{strings.ClearData}}" raisedButton on-click="{{clearData}}"></paper-button>
+    <br>
+    <paper-button id="cmdPopulate" label="{{strings.PopulateData}}" raisedButton on-click="{{populateData}}"></paper-button>
+
   </div>
  
 </template>
 <script>
  Polymer('olbapro-setup', {
+
     ready: function () {         
    		
+       
+    },
+    changeDatabase:function(){
+      for (var i=0;i<this.config.databases.length;i++){
+        if (this.config.databases[i].name==this.config.databaseName){
+           this.config.databaseUrl=this.config.databases[i].url;
+        }
+      }
        
     },
     clearData:function(){

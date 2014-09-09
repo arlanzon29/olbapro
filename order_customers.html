@@ -1,4 +1,4 @@
-<polymer-element name="olbapro-customers" attributes="customer pricelist customers selectedCustomer" extends="olbapro-form">
+<polymer-element name="olbapro-customers" attributes="customer pricelist customers selectedCustomer language" extends="olbapro-form">
 <template>
     <style>
     
@@ -7,13 +7,22 @@
     }
   
   </style>
+    <olbapro-strings language="{{language}}" strings="{{strings}}">
+      <string id="MasterData" es="Datos Maestros" en="Master Data"></string>
+      <string id="CustomerCode" es="Codigo cliente" en="Customer code"></string>
+      <string id="CustomerName" es="Nombre cliente" en="Customer name"></string>
+      <string id="ErrorSameCode" es="Hay un elemento con el mismo código" en="There is an element with the same code"></string>     
+      <string id="Address" es="Direccion" en="Address"></string>
+      <string id="PriceList" es="Lista Precios" en="Price List"></string>
+    </olbapro-strings>
+
   <section style="background: steelblue;" on-blur="{{test}}">
-      <paper-button label="Master Data" on-click="{{collapse}}" id="Master"></paper-button>
+      <paper-button label="{{strings.MasterData}}" on-click="{{collapse}}" id="Master"></paper-button>
       <core-collapse id="colMaster"  class="box" opened  >
         <div vertical layout>
-        	<paper-input label="Customer code" id="cardcode" value="{{currentRecord.cardcode}}" floatinglabel  olbapro key updateallowed="true" on-validate="{{cardcodeValidate}}" mandatory></paper-input>
-          <paper-input label="Customer name" id="cardname" value="{{currentRecord.cardname}}" floatinglabel  olbapro mandatory></paper-input>
-          <span>Price List</span>
+        	<paper-input label="{{strings.CustomerCode}}" id="cardcode" value="{{currentRecord.cardcode}}" floatinglabel  olbapro key updateallowed="true" on-validate="{{cardcodeValidate}}" mandatory></paper-input>
+          <paper-input label="{{strings.CustomerName}}" id="cardname" value="{{currentRecord.cardname}}" floatinglabel  olbapro mandatory></paper-input>
+          <span>{{strings.PriceList}}</span>
           <paper-radio-group selected="{{currentRecord.pricelist}}" >
       	   <template repeat="{{ value, j in pricelist }}">
       	    <paper-radio-button label="{{value.name}}" value="{{value.code}}" name="{{value.code}}" olbapro></paper-radio-button><br>
@@ -24,9 +33,9 @@
     </section>
     <br>
     <section style="background: steelblue;">
-      <paper-button label="Address" on-click="{{collapse}}" id="Address" ></paper-button>
+      <paper-button label="{{strings.Address}}" on-click="{{collapse}}" id="Address" ></paper-button>
       <core-collapse id="colAddress"  class="box" opened  >
-        <paper-input label="Address" multiline maxRows="5" value="{{currentRecord.address}}"  floatinglabel olbapro ><paper-input>
+        <paper-input label="{{strings.Address}}" multiline maxRows="5" value="{{currentRecord.address}}"  floatinglabel olbapro ><paper-input>
       </core-collapse>
     </section>
 
