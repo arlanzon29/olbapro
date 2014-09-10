@@ -46,6 +46,17 @@
   </div>
 </template>
 <script>
+/* Resumen de parametros
+  customer, Cliente Actual
+  pricelist, Lista de precios
+  customers, Lista de clientes
+  selectedCustomer, Key Firebase del cliente actual
+  language, idioma
+
+  Variables
+  currentRecord, tiene una copia del cliente actual para trabajar con ella.
+
+*/
  Polymer('olbapro-customers', {    
     collapse:function(event){
       this.$["col"+event.currentTarget.id].toggle();

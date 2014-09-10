@@ -79,15 +79,18 @@
 
   <polymer-element name="olbapro-order">
     <template>
-    <olbapro-firebase id="dataPriceList" url="{{config.databaseUrl}}" path="/pricelist" data="{{pricelist}}"></olbapro-firebase>
+    <olbapro-firebase id="dataPriceList" url="{{config.databaseUrl}}" path="/pricelist" data="{{pricelist}}" save="{{savePriceList}}" changerows="{{priceListChanges}}"></olbapro-firebase>
     <olbapro-firebase id="customers" url="{{config.databaseUrl}}" path="/customer" data="{{customers}}"></olbapro-firebase>
-    <olbapro-firebasesingle id="customerData" url="{{config.databaseUrl}}" path="/customer}}" data="{{customer}}" key="{{keyCustomer}}" save="{{saveCustomer}}"></olbapro-firebasesingle>
+    <olbapro-firebasesingle id="customerData" url="{{config.databaseUrl}}" path="/customer" data="{{customer}}" key="{{keyCustomer}}" save="{{saveCustomer}}"></olbapro-firebasesingle>
 
     
-    <olbapro-firebase id="dataOrders" url="{{config.databaseUrl}}" url="/order" data="{{orderRows}}"></olbapro-firebase>
+    <olbapro-firebase id="dataOrders" url="{{config.databaseUrl}}" path="/order" data="{{orderRows}}"></olbapro-firebase>
      <olbapro-firebasesingle id="dataOrder" url="{{config.databaseUrl}}" path="/order" data="{{order}}" key="{{keyOrder}}" save="{{saveOrder}}"></olbapro-firebasesingle>
 
-    <core-localstorage id="items" name="items" value="{{items}}"></core-localstorage>
+    <olbapro-firebase id="fireItems" url="{{config.databaseUrl}}" path="/item" data="{{itemRows}}"></olbapro-firebase>
+     <olbapro-firebasesingle id="fireItem" url="{{config.databaseUrl}}" path="/item" data="{{itemRecord}}" key="{{keyItem}}" save="{{saveItem}}"></olbapro-firebasesingle>
+
+   
     <core-localstorage id="configOrderFire" name="configOrderFire" value="{{config}}"></core-localstorage>
    
   
@@ -122,22 +125,22 @@
         </section>
         <section class="seccion">
         <olbapro-setup pricelist="{{pricelist}}" customers="{{customers}}" items="{{items}}" orders="{{orders}}"
-        language="{{config.language}}" strings="{{strings}}" config="{{config}}"></obbapro-setpup>
+        language="{{config.language}}" strings="{{strings}}" config="{{config}}" save="{{saveconfig}}"></obbapro-setpup>
         </section>    
         <section class="seccion">
           <br>
-          <olbapro-pricelist pricelist="{{pricelist}}" on-save="{{savePriceList}}" language="{{config.language}}"></olbapro-pricelist>
+          <olbapro-pricelist pricelist="{{pricelist}}"  language="{{config.language}}" changerows="{{priceListChanges}}" save="{{savePriceList}}"></olbapro-pricelist>
         </section>
         <section class="seccion">
           <br>
-          <olbapro-items pricelist="{{pricelist}}" on-save="{{saveItem}}" register="{{item}}" on-list="{{itemList}}" id="itemsElement" on-delete="{{deleteItem}}"></olbapro-items>
+          <olbapro-items pricelist="{{pricelist}}" rows="{{itemRows}}" register="{{itemRecord}}" selectedkey="{{keyItem}}" id="itemsElement" language="{{config.language}}"  save="{{saveItem}}"></olbapro-items>
         </section>                       
         <section class="seccion">
           <br>
           <olbapro-customers pricelist="{{pricelist}}" save="{{saveCustomer}}" register="{{customer}}" customers="{{customers}}" selectedCustomer="{{keyCustomer}}" id="customersElement" language="{{config.language}}"></olbapro-customers>                   
         </section>          
         <section class="seccion">
-        <olbapro-orderform  register="{{order}}" rows="{{orderRows}}" selectedRowId="{{keyOrder}}" customers="{{customers}}" selectedCustomer="{{keyCustomer}}" save="{{saveOrder}}" id="ordersElement" language="{{config.language}}"></olbapro-orderform>
+        <olbapro-orderform  register="{{order}}" rows="{{orderRows}}" register="{{order}}" selectedRowId="{{keyOrder}}" customers="{{customers}}" selectedCustomer="{{keyCustomer}}" save="{{saveOrder}}" id="ordersElement" language="{{config.language}}"></olbapro-orderform>
 
         </section>          
       </core-animated-pages>
@@ -146,17 +149,39 @@
 
     </core-scaffold>
 
-    <olbapro-itemdialog id="itemlistdialog" rows="{{items}}" selectedRow="{{item}}"></olbapro-itemdialog>
    
         
         
     </template>
 
     <script>
-      
+      /* Resumen de variables 
+        config, Configuracion del sistema
+        config.language Idioma actual
+        config.databaseUrl Url base de firebase
+        saveconfig, flag para grabar la configuración
+        
+        strings, objecto con la traduccion de los literales
+        core_selected, indica que pantala debemos mostrar
+        title, texto de encabezado
+
+        pricelist, Array con la lista de precios
+
+        customers, Lista con los clientes
+        customer, Cliente actual
+        keyCustomer, Clave Firebase del cliente actual
+        saveCustomer, Flag para indicar que queremos grabar el cliente customer.
+
+        orderRows, Lista de pedidos
+        order, Pedido Actual
+        keyOrder, Clave firebase del pedido actual
+        saveOrder, Flag para indicar que quiero grabar el pedido actual.
+
+      */
       Polymer('olbapro-order', {       
         keyCustomer:"",
         config:null,
+        saveconfig:false,
         created:function(){
           this.pricelist=[];
           this.customers=[];
@@ -169,15 +194,18 @@
 
            this.$.configOrderFire.load();
           if (this.config==null){
-            this.config=     {"language":"en","database":"test","databaseUrl":"https://blazing-fire-9906.firebaseio.com/database",
-          "databases":[{"name":"test","url":"https://blazing-fire-9906.firebaseio.com/database"},
-                      {"name":"test2","url":"https://blazing-fire-9906.firebaseio.com/database2"}]}
-                      }    
+            this.config={"language":"en",
+                          "database":"test",
+                          "databaseUrl":"https://blazing-fire-9906.firebaseio.com/database",
+                          "databases":[
+                              {"name":"test","url":"https://blazing-fire-9906.firebaseio.com/database"}
+                          ]}
+            }    
         },
         stringsChanged:function(){
            this.changeTitle();
 
-            this.$.configOrderFire.save();
+            
 
         },
         changeTitle:function(){
@@ -230,45 +258,13 @@
           }
           this.$.scaffold.closeDrawer();
           
-        },
-        savePriceList:function(event,obj){          
-          this.$.dataPriceList.saveData(obj.update);
-          this.$.dataPriceList.saveData(obj.insert);   
-        },
-        orderList:function(){
-          this.$.orderlistdialog.show();
-        },
-        moreButtons:function(){
-          if (!this.$.colButtons.opened){
-            this.$.colButtons.opened=true;
-            this.$.cmdMore.icon="expand-less";
-          }else{
-            this.$.colButtons.opened=false;
-            this.$.cmdMore.icon="expand-more";
+        },      
+        saveconfigChanged:function(){
+          if (this.saveconfig){
+            this.$.configOrderFire.save(); 
+            this.saveconfig=false; 
           }
-        },
-        saveItem:function(){
-          if ( this.items == "undefined") {
-            this.items=[];
-          }
-  
-          if (this.$.itemsElement.mode=="insert"){
-                this.items.push(this.item);
-          }
-          this.$.items.save();
-          this.$.itemsElement.postCommit();
-        },
-        deleteItem:function(event,item){
-          for (var i=0;i<this.items.length;i++){
-            if (this.items[i].itemcode==item.itemcode){
-              this.items.splice(i,1);
-            }
-          }
-          this.$.items.save();
-          this.$.itemsElement.postDelete();
-
-        },itemList:function(){
-          this.$.itemlistdialog.show();
+          
         }
       });
     </script>

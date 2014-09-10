@@ -1,4 +1,4 @@
-<polymer-element name="olbapro-firebase" attributes="url path data ">
+<polymer-element name="olbapro-firebase" attributes="url path data save changerows">
 <template >
  
 </template>
@@ -60,6 +60,36 @@
 
       
        
+    },
+     deleteData:function(data){
+      if (data instanceof Array){
+        for (var i=0;i<data.length;i++){
+          if (data[i].firebaseId!=null){         
+           var ref = new Firebase(this.url+this.path+"/"+data[i].firebaseId);
+           ref.set(null);
+          }
+        }
+
+      }else{
+        if (data.firebaseId!=null){
+         var ref = new Firebase(this.url+this.path+"/"+data.firebaseId);
+           ref.set(null);
+        }
+      }
+
+
+      
+       
+    },
+    saveChanged:function(){
+      if (this.save==true){
+        this.saveData(this.changerows.insert);
+        this.saveData(this.changerows.update);
+        this.deleteData(this.changerows.delete);
+
+        this.save=false;
+      }
+
     }
 
  });

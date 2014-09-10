@@ -1,4 +1,4 @@
-<polymer-element name="olbapro-setup" attributes="pricelist customers items orders language config">
+<polymer-element name="olbapro-setup" attributes="pricelist customers items orders language config save">
 <template>
 	<style>
 		
@@ -11,8 +11,10 @@
       <string id="ClearData" es="Limpiar Datos" en="Clear Data"></string>   
       <string id="PopulateData" es="Rellenar Datos" en="Populate Data"></string>     
       <string id="ChooseYourDatabase" es="Escoja base de datos" en="Choose your database"></string>            
-       <string id="ChooseYourLanguage" es="Escoja un idioma" en="Choose your language"></string>   
-     
+      <string id="ChooseYourLanguage" es="Escoja un idioma" en="Choose your language"></string>   
+      <string id="ApplySetup" es="Grabar Configuración" en="Save Setup"></string>        
+      <string id="Name" es="Nombre" en="Name"></string>        
+      <string id="Url" es="Dirección Firebase" en="Firebase URL"></string>        
     </olbapro-strings>
 
     <span>{{strings.ChooseYourLanguage}}</span><br>
@@ -30,19 +32,27 @@
     <br>
 
     <paper-button id="cmdNew" label="{{strings.AddNew}}" raisedButton on-click="{{addNew}}"></paper-button>
+
     <br>
-    <paper-button id="cmdClear" label="{{strings.ClearData}}" raisedButton on-click="{{clearData}}"></paper-button>
-    <br>
-    <paper-button id="cmdPopulate" label="{{strings.PopulateData}}" raisedButton on-click="{{populateData}}"></paper-button>
+     <paper-button id="cmdApply" label="{{strings.ApplySetup}}" raisedButton on-click="{{saveConfig}}"></paper-button>
 
   </div>
  
+
+ <paper-dialog  heading="Add New Database" id="dialogAddNew">
+ <br>
+    <paper-input value="{{addNewDatabaseName}}" label="{{strings.Name}}"></paper-input>
+    <br>
+    <paper-input value="{{addNewDatabaseUrl}}" label="{{strings.Url}}"></paper-input>     
+    <paper-fab icon="done" class="mini" id="cmdSelect"  on-click="{{addNewDataBase}}" ></paper-fab>
+
+  </paper-dialog>
 </template>
 <script>
  Polymer('olbapro-setup', {
 
     ready: function () {         
-   		
+   		this.$.dialogAddNew.opened=false;
        
     },
     changeDatabase:function(){
@@ -51,7 +61,10 @@
            this.config.databaseUrl=this.config.databases[i].url;
         }
       }
-       
+     
+    },
+    addNew:function(){
+      this.$.dialogAddNew.opened=true;
     },
     clearData:function(){
       this.pricelist=[];
@@ -78,6 +91,13 @@
         {"cardcode":"C01","cardname":"Mi primer cliente","pricelist":"L01"},
         {"cardcode":"C02","cardname":"Mi segundo cliente","pricelist":"L02"}        
       ];
+    },
+    saveConfig:function(){
+      this.save=true;
+    },
+    addNewDataBase:function(){
+      this.config.databases.push({"name":this.addNewDatabaseName,"url":this.addNewDatabaseUrl});
+      this.$.dialogAddNew.opened=false;
     }
  });
  </script>

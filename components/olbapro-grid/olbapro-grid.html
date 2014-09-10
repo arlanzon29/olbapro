@@ -107,7 +107,7 @@ Polymer('olbapro-grid', {
 
       span.grid=this;
       span.onclick=function(event){this.grid.clickHeader(event)};
-          
+      columns.children[i].controlHeader=span;
 
       var width=columns.children[i].width;
       totalWidth+=parseInt(width)+5+1; /* width +padding+border */
@@ -248,7 +248,7 @@ refreshDataPosCell:function(visualRow){
     if (this.dataSource[visualRow+this.firstRow].status=="new" || this.dataSource[visualRow+this.firstRow].status=="insert"){
       this.shadowRoot.querySelector("#pos"+pad(visualRow,3)).value="*";
     }else{
-      this.shadowRoot.querySelector("#pos"+pad(visualRow,3)).value=this.dataSource[visualRow+this.firstRow].position; 
+      this.shadowRoot.querySelector("#pos"+pad(visualRow,3)).value=this.dataSource[visualRow+this.firstRow].position+1; 
     }
   }else{
     this.shadowRoot.querySelector("#pos"+pad(visualRow,3)).value=""; 
@@ -617,7 +617,14 @@ getDeleteRows:function(){
 
   for (var i=0;i<this.dataSource.length;i++){
     if (this.dataSource[i].status=="deleted"){
-      arr.push(i);
+      var newObj=this.dataSource[i];
+
+      var olbObj=this.data[newObj.position];
+      for (var j=0;j<this.columns.length;j++){
+        olbObj[this.columns[j].id]=newObj[this.columns[j].id].value;
+      }
+
+      arr.push(olbObj);
     }
   }
 
@@ -710,6 +717,11 @@ setValue:function(column,row,value){
       setValue:function(row,value){
     
         this.grid.setValue(this.id,row,value);
+      },
+      labelChanged:function(){
+        if (this.controlHeader!=null){
+          this.controlHeader.innerHTML=this.label;
+        }
       }
 
     });

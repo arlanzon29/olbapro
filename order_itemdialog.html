@@ -1,4 +1,4 @@
-<polymer-element name="olbapro-itemdialog" attributes="rows selectedRow">
+<polymer-element name="olbapro-itemdialog" attributes="rows selectedkey">
 <template>
 <style type="text/css">
     paper-dialog {
@@ -39,7 +39,7 @@
       this.$.dialog.opened=true;
     },
     select:function(){
-      this.selectedRow=this.rows[this.$.grid.getSelectedRows()[0]];
+      this.selectedkey=this.rows[this.$.grid.getSelectedRows()[0]].firebaseId;;
       this.$.dialog.opened=false;
     }
  });

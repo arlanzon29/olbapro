@@ -1,4 +1,4 @@
-<polymer-element name="olbapro-pricelist" attributes="pricelist language">
+<polymer-element name="olbapro-pricelist" attributes="pricelist language save changerows ">
 <template>
 	<style>
 		#cmdSave
@@ -31,7 +31,7 @@
       <olbapro-column id="name" label="{{strings.Name}}" width="250"  updateallowed></olbapro-column>
     </olbapro-columns>
   </olbapro-grid> 
-<paper-fab icon="save" class="mini" id="cmdSave"  on-click="{{save}}" ></paper-fab>
+<paper-fab icon="save" class="mini" id="cmdSave"  on-click="{{saveClick}}" ></paper-fab>
 <paper-fab icon="delete" class="mini" id="cmdDelete" on-click="{{delete}}" ></paper-fab>
 </template>
 <script>
@@ -48,16 +48,14 @@
 			this.filterData[i].position=i;
 		}
     },
-    save:function(){
+    saveClick:function(){
       var obj={};
       obj.update=this.$.grid.getUpdateRows();
       obj.insert=this.$.grid.getInsertRows();
-    	/*var deleteRows=this.$.grid.getDeleteRows(); 
-    	for (var i=deleteRows.length-1;i>=0;i--){
-    		this.pricelist.splice(this.filterData[deleteRows[i]].position, 1);
-    	}*/
-    	this.fire("save",obj);
-    	this.filterData=this.pricelist;
+      obj.delete=this.$.grid.getDeleteRows();
+      this.changerows=obj;
+      this.save=true;
+    	
     },
     delete:function(){
     	this.$.grid.deleteSelectedRows();    	

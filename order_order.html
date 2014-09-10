@@ -30,6 +30,11 @@
       <string id="OrderNumber" es="Numero Pedido" en="Order Number"></string>  
       <string id="DocDate" es="Fecha Doc." en="Doc. Date"></string> 
       <string id="ShipDate" es="Fecha Entre." en="Ship Date"></string>  
+      <string id="Item" es="Articulo" en="Item"></string>  
+      <string id="Description" es="Descripción" en="Description"></string>  
+      <string id="Quantity" es="Cantidad" en="Quantity"></string>  
+      <string id="Price" es="Precio" en="Price"></string>  
+      <string id="Total" es="Total" en="Total"></string>              
     </olbapro-strings>
 
     <section style="background: steelblue;">
@@ -57,7 +62,7 @@
     <section style="background: steelblue;">
       <paper-button label="{{strings.Address}}" on-click="{{collapse}}" id="Address"></paper-button>
       <core-collapse id="colAddress"  class="box" opened  >
-        <paper-input label="{{strings.Address}}" id="address" multiline maxRows="5" value="{{currentRecord.address}}"  floatinglabel olbapro ></paper-input>
+        <paper-input label="{{strings.Address}}" id="address" multiline maxRows="5" value="{{currentRecord.address}}"  floatinglabel  ></paper-input>
 
       </core-collapse>
     </section>
@@ -78,11 +83,11 @@
       <div style="overflow:scroll;overflow-y:hidden;">
         <olbapro-grid  rows="5" data="{{currentRecord.lines}}"  selectionmode="none" olbapro>
             <olbapro-columns>
-              <olbapro-column id="item" label="Item"  width="60"  ></olbapro-column>
-              <olbapro-column id="description" label="Description" width="150"></olbapro-column>
-              <olbapro-column id="quantity" label="Quantity" width="100" updateallowed></olbapro-column>
-              <olbapro-column id="price" label="Price" width="100" updateallowed></olbapro-column>
-              <olbapro-column id="total" label="Total" width="100" updateallowed></olbapro-column>
+              <olbapro-column id="Item" label="{{strings.Item}}"  width="60"  ></olbapro-column>
+              <olbapro-column id="Description" label="{{strings.Description}}" width="150"></olbapro-column>
+              <olbapro-column id="Quantity" label="{{strings.Quantity}}" width="100" updateallowed></olbapro-column>
+              <olbapro-column id="Price" label="{{strings.Price}}" width="100" updateallowed></olbapro-column>
+              <olbapro-column id="Total" label="{{strings.Total}}" width="100" updateallowed></olbapro-column>
             </olbapro-columns>
           </olbapro-grid>
           <br>         
@@ -120,7 +125,12 @@
 
       if (data.length==1){
         this.currentRecord.cardname=data[0].cardname;
-        this.currentRecord.address=data[0].address;
+        if (data[0].address==null){
+          this.currentRecord.address="";
+        }else{
+          this.currentRecord.address=data[0].address;
+        }
+   
         this.selectedCustomer=data[0].firebaseId;
 
         if (this.rows.length==0){

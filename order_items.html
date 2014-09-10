@@ -1,72 +1,48 @@
-<polymer-element name="olbapro-items" attributes="register pricelist mode" >
+<polymer-element name="olbapro-items" attributes="register pricelist mode language rows selectedkey" extends="olbapro-form">
 <template >
   <style>
    .box {
       background: #eee;
     }
-    #cmdMore
-      {
-          position: absolute;
-          right: 20px;
-          top: 10px;
-           background: tomato;
-      }
-    #cmdSave
-      {
-           background: #5677fc;
-      }
-      #cmdDelete
-      {
-         
-           background: #5677fc;
-      }
-      #cmdList
-      {
-          
-           background: #5677fc;
-      }
-      #cmdAdd
-      {
-          
-           background: #5677fc;
-      }
-      #cmdUndo
-      {
-          
-           background: #5677fc;
-      }      
-      #colButtons{
-         position: absolute;
-          right: 20px;
-          top: 60px;
-      }
-      .box {
-      background: #eee;
-    }
+    
   </style>
+  <olbapro-strings language="{{language}}" strings="{{strings}}">
+    <string id="MasterData" es="Datos Maestros" en="Master Data"></string>
+    <string id="ItemCode" es="Codigo" en="Item code"></string>
+    <string id="ItemName" es="Descripción" en="Description"></string>
+    <string id="ErrorSameCode" es="Hay un elemento con el mismo código" en="There is an element with the same code"></string>     
+    <string id="Vat" es="IVA" en="VAT"></string>
+    <string id="Inactive" es="Inactivo" en="Inactive"></string>    
+    <string id="PriceList" es="Lista Precios" en="Price List"></string>
+    <string id="Code" es="Código" en="Code"></string>    
+    <string id="Name" es="Nombre" en="Name"></string>    
+    <string id="Price" es="Precio" en="Price"></string>    
+    
+  </olbapro-strings>
+
   <div vertical layout>
     <section style="background: steelblue;">
-      <paper-button label="Master Data" on-click="{{collapseMaster}}"></paper-button>
+      <paper-button label="{{strings.MasterData}}" on-click="{{collapseMaster}}"></paper-button>
       <core-collapse id="colMaster"  class="box" opened >
         <div class="content" layout vertical>
 
-        	<paper-input label="Item code" id="itemcode" value="{{item.itemcode}}" floatinglabel on-blur="{{validateItem}}"></paper-input>
-          <paper-input label="Item name" id="itemname" value="{{item.itemname}}" floatinglabel on-blur="{{validateItem}}"></paper-input>
-          <paper-input label="VAT" id="vat" value="{{item.vat}}" floatinglabel on-blur="{{validateItem}}"></paper-input>
-          <paper-checkbox label="Inactive" value="{{item.inactive}}" on-blur="{{validateItem}}"></paper-checkbox>
+        	<paper-input label="{{strings.ItemCode}}" id="itemcode" value="{{currentRecord.itemcode}}" floatinglabel  olbapro key></paper-input>
+          <paper-input label="{{strings.ItemName}}" id="itemname" value="{{currentRecord.itemname}}" floatinglabel  olbapro></paper-input>
+          <paper-input label="{{strings.Vat}}" id="vat" value="{{currentRecord.vat}}" floatinglabel ></paper-input>
+          <paper-checkbox label="{{strings.Inactive}}" value="{{currentRecord.inactive}}"  olbapro></paper-checkbox>
         </div>
       </core-collapse>
     </section>
     <br>
     <section style="background: seagreen;">
-      <paper-button label="Price List" on-click="{{collapsePrice}}"></paper-button>
+      <paper-button label="{{strings.PriceList}}" on-click="{{collapsePrice}}"></paper-button>
         <core-collapse id="colPrice"  class="box" >
           <br>
           <olbapro-grid  rows="5"  data="{{item.prices}}" selectionmode="none" id="gridPrices">
             <olbapro-columns>
-              <olbapro-column id="code" label="Code"  width="60"  ></olbapro-column>
-              <olbapro-column id="name" label="Name" width="150"></olbapro-column>
-              <olbapro-column id="price" label="Price" width="100" updateallowed></olbapro-column>
+              <olbapro-column id="code" label="{{strings.Code}}"  width="60"  ></olbapro-column>
+              <olbapro-column id="name" label="{{strings.Name}}" width="150"></olbapro-column>
+              <olbapro-column id="price" label="{{strings.Price}}" width="100" updateallowed></olbapro-column>
             </olbapro-columns>
           </olbapro-grid> 
 
@@ -74,36 +50,17 @@
     </section>
 
   </div>
-      
-
-  </section>
-
-    <paper-fab icon="expand-more" class="mini" id="cmdMore"  on-click="{{moreButtons}}" ></paper-fab>
-    <core-collapse id="colButtons"  class="box"  >
-      <div vertical layout>
-        <paper-fab icon="save" class="mini" id="cmdSave"  on-click="{{saveClick}}" ></paper-fab>
-        <br>
-        <paper-fab icon="delete" class="mini" id="cmdDelete" on-click="{{deleteClick}}" ></paper-fab>
-        <br>
-        <paper-fab icon="list" class="mini" id="cmdList" on-click="{{listClick}}" ></paper-fab>
-        <br>
-        <paper-fab icon="add" class="mini" id="cmdAdd" on-click="{{addClick}}" ></paper-fab>
-        <br>
-        <paper-fab icon="undo" class="mini" id="cmdUndo" on-click="{{undoClick}}" ></paper-fab>        
-      </div>
-    </core-collapse>
+      <olbapro-itemdialog id="itemlistdialog" rows="{{rows}}" selectedkey="{{selectedkey}}"></olbapro-itemdialog>
+  
+  <shadow>/<shadow>
+  
+ 
 </template>
 <script>
  Polymer('olbapro-items', {
   	item:{"itemcode":"","itemname":"","vat":21,"inactive":false,prices:[]},
     mode:"",
-    ready: function () {  
-      this.item.prices=[];       
-   	  for (var i=0;i<this.pricelist.length;i++){
-        this.item.prices.push({"code":this.pricelist[i].code,"name":this.pricelist[i].name,"price":0})
-      }
-      this.mode="new";
-    },
+   
     collapseMaster:function(){
       this.$.colMaster.toggle();
     },
@@ -130,125 +87,12 @@
         }
         this.item.prices.push({"code":this.pricelist[i].code,"name":this.pricelist[i].name,"price":price})
       }
-    },
-    moreButtons:function(){
-      if (!this.$.colButtons.opened){
-        this.$.colButtons.opened=true;
-        this.$.cmdMore.icon="expand-less";
-      }else{
-        this.$.colButtons.opened=false;
-        this.$.cmdMore.icon="expand-more";
-      }
     }
-    ,
-     saveClick:function(){ 
-     this.$.gridPrices.updateData();
-
-      if (this.mode=="update"){
-        for(var propertyName in this.item) {
-           this.register[propertyName]=this.item[propertyName];
-        }
-      }else{
-        this.register=this.item;
-      }
-
-      this.fire("save");
-      this.$.colButtons.opened=false;
-      this.$.cmdMore.icon="expand-more";
-    },
+    ,   
     listClick:function(){      
-      this.fire("list");
-      this.$.colButtons.opened=false;
-        this.$.cmdMore.icon="expand-more";
-    },
-    addClick:function(){
-      this.item.itemcode="";
-      this.item.itemname="";
-      this.item.vat="";
-      this.item.prices=[];
-
-      for (var i=0;i<this.pricelist.length;i++){
-        this.item.prices.push({"code":this.pricelist[i].code,"name":this.pricelist[i].name,"price":0})
-      }
-      this.mode="new";
-      this.$.colButtons.opened=false;
-        this.$.cmdMore.icon="expand-more";
-    },
-    deleteClick:function(){
-      this.fire("delete",this.item);
-      this.$.colButtons.opened=false;
-      this.$.cmdMore.icon="expand-more";
-    },undoClick:function(){
-      if (this.mode=="update"){
-        this.registerChanged();
-      }else if (this.mode=="insert"){
-        this.addClick();
-      }
-    },registerChanged:function(){
-      if (this.register.itemcode==""){
-        this.mode="new";
-      }else{
-        this.mode="ok";
-      }
-
-      this.item=JSON.parse(JSON.stringify(this.register));
-      this.pricelistChanged();
-    },
-    postCommit:function(){
-      this.mode="ok";
-    },
-    postDelete:function(){
-      this.addClick();
-    },modeChanged:function(){
-      if (this.mode=="ok"){
-        this.$.itemcode.readonly=true; 
-        this.$.cmdSave.hidden=true;
-        this.$.cmdList.hidden=false;   
-        this.$.cmdAdd.hidden=false;   
-        this.$.cmdDelete.hidden=false;   
-        this.$.cmdUndo.hidden=true;   
-      }else if (this.mode=="insert"){
-        this.$.itemcode.readonly=false; 
-        this.$.cmdSave.hidden=false;  
-        this.$.cmdList.hidden=true;
-        this.$.cmdAdd.hidden=true;   
-        this.$.cmdDelete.hidden=true; 
-        this.$.cmdUndo.hidden=false;   
-      }
-      else if (this.mode=="new"){
-        this.$.itemcode.readonly=false; 
-        this.$.cmdSave.hidden=true; 
-        this.$.cmdList.hidden=false; 
-        this.$.cmdAdd.hidden=true;          
-        this.$.cmdDelete.hidden=true; 
-        this.$.cmdUndo.hidden=true;           
-      }
-      else if (this.mode=="update"){
-        this.$.itemcode.readonly=false; 
-        this.$.cmdSave.hidden=false; 
-        this.$.cmdList.hidden=true; 
-        this.$.cmdAdd.hidden=true;    
-        this.$.cmdDelete.hidden=true;  
-        this.$.cmdUndo.hidden=false;   
-      }
-    },
-    validateItem:function(event){
-      var changed=false;
-
-      if (this.register==null){
-        changed=true;
-      }else if (this.register[event.currentTarget.id]!=event.currentTarget.value){
-        changed=true;  
-      }
-
-      if (changed){
-        if (this.mode=="ok"){
-          this.mode="update";
-        }else if (this.mode=="new"){
-          this.mode="insert";
-        }
-      }
+      this.$.itemlistdialog.show();
     }
+
 
  });
  </script>
