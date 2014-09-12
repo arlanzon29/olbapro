@@ -155,6 +155,12 @@ Polymer('olbapro-grid', {
           obj.insertallowed=true;
         }
 
+        if (columns.children[i].textalign!=""){
+          obj.$.input.style.textAlign=columns.children[i].textalign;
+        }
+
+
+
         if (width!=""){
           obj.style.width=width+"px";
         }
@@ -164,8 +170,9 @@ Polymer('olbapro-grid', {
         obj.onkeydown=function(event){
           this.grid.keyDown(event)
         };
-        obj.onfocus=function(event){this.grid.focus(event)};
+        obj.onfocus=function(event){ this.grid.focus(event)};
         obj.onblur=function(event){this.grid.blur(event)};
+
 
         row.appendChild(obj);
       }             
@@ -329,6 +336,7 @@ blur:function(event){
 
       this.getColumnByName(colum).control.fire("validate",obj);
       this.fire("validatecell",obj);
+      
 
       
 
@@ -406,8 +414,6 @@ insertAllowedChanged:function(){
   this.setMaxSlider();
 },
 dataChanged:function(){
-
-
     this.dataSource=[];
     for (var i=0;i<this.data.length;i++){
       var obj={};
@@ -706,7 +712,7 @@ setValue:function(column,row,value){
 
 </polymer-element>
 
-<polymer-element name="olbapro-column" attributes="label width updateallowed">
+<polymer-element name="olbapro-column" attributes="label width updateallowed textalign">
   <template></template>
   <script>
     Polymer('olbapro-column', {

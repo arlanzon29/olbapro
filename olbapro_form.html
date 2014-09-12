@@ -77,10 +77,25 @@
           if (ele.attributes.getNamedItem("key")!=null){
             this.key=ele.id;
           }
+          if (ele.attributes.getNamedItem("textalign")!=null){
+             ele.$.input.style.textAlign=ele.attributes.getNamedItem("textalign").value;
+          }
+
           ele.olbaproForm=this;
-          ele.onblur=function(event){
-            this.olbaproForm.validateItem(event)
-          };
+
+          if (ele.tagName=="PAPER-CHECKBOX"){
+            ele.onchange=function(event){
+              this.olbaproForm.validateItem(event)
+            };
+          }if (ele.tagName=="OLBAPRO-GRID"){
+            ele.addEventListener('validatecell',function(event){
+              this.olbaproForm.validateItem(event)
+            });
+          }else{
+            ele.onblur=function(event){
+              this.olbaproForm.validateItem(event)
+            };
+          }
 
          }
       }
@@ -102,8 +117,7 @@
         this.$.cmdMore.icon="expand-more";
       }
     }
-    ,
-     saveClick:function(){ 
+    ,saveClick:function(){ 
 
       for (var i=0;i<this.olbaproControls.length;i++){
         if (this.olbaproControls[i].invalid){
@@ -112,6 +126,14 @@
           return false;
         }
       }
+
+      for (var i=0;i<this.olbaproControls.length;i++){
+        if (this.olbaproControls[i].tagName=="OLBAPRO-GRID"){
+          this.olbaproControls[i].updateData();
+        }
+      }
+
+    
      
       if (this.mode=="update"){
         for(var propertyName in this.currentRecord) {
@@ -132,10 +154,14 @@
         this.$.cmdMore.icon="expand-more";
     },
     newRecord:function(){
+
       this.register={};
 
       for (var i=0;i<this.olbaproControls.length;i++){
         var ele=this.olbaproControls[i];
+       if (ele.tagName=="OLBAPRO-GRID"){
+        this.register[ele.id]=[];
+       }else{
          if (ele.attributes.getNamedItem("defaultvalue")!=null){
             this.register[ele.id]=ele.attributes.getNamedItem("defaultvalue").value;
          }else{
@@ -145,8 +171,11 @@
             ele.error="Debe indicar un valor obligatoriamente";
             ele.invalid=true;
           }
+        }
 
       }
+     
+
     },
     addClick:function(){
       this.key="";
@@ -178,6 +207,7 @@
       }
 
       this.currentRecord=JSON.parse(JSON.stringify(this.register));
+
     },
     postCommit:function(){
       this.mode="ok";
@@ -242,13 +272,24 @@
 
     },
     validateItem:function(event){
+  
       var changed=false;
 
       if (this.register==null){
         changed=true;
-      }else if (this.register[event.currentTarget.id]!=event.currentTarget.value){
-        changed=true;  
-      }
+      }else{
+        if (event.currentTarget.tagName=="PAPER-CHECKBOX"){
+          if (this.register[event.currentTarget.id]!=event.currentTarget.checked){
+            changed=true;  
+          }
+        }else if (event.currentTarget.tagName=="OLBAPRO-GRID"){
+          changed=true;
+        }else{
+          if (this.register[event.currentTarget.id]!=event.currentTarget.value){
+            changed=true;  
+          }
+        }
+      } 
 
 
       if (changed){
@@ -266,6 +307,7 @@
           event.currentTarget.error="Debe indicar un valor para este campo";
           event.currentTarget.invalid=true;
         }
+       
     },
     dirty:function(){
      if (this.mode=="ok"){

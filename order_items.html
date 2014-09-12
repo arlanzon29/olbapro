@@ -26,10 +26,10 @@
       <core-collapse id="colMaster"  class="box" opened >
         <div class="content" layout vertical>
 
-        	<paper-input label="{{strings.ItemCode}}" id="itemcode" value="{{currentRecord.itemcode}}" floatinglabel  olbapro key></paper-input>
-          <paper-input label="{{strings.ItemName}}" id="itemname" value="{{currentRecord.itemname}}" floatinglabel  olbapro></paper-input>
-          <paper-input label="{{strings.Vat}}" id="vat" value="{{currentRecord.vat}}" floatinglabel ></paper-input>
-          <paper-checkbox label="{{strings.Inactive}}" value="{{currentRecord.inactive}}"  olbapro></paper-checkbox>
+        	<paper-input label="{{strings.ItemCode}}" id="itemcode" value="{{currentRecord.itemcode}}" floatinglabel  olbapro mandatory key updateallowed="false"></paper-input>
+          <paper-input label="{{strings.ItemName}}" id="itemname" value="{{currentRecord.itemname}}" floatinglabel  olbapro mandatory></paper-input>
+          <paper-input label="{{strings.Vat}}" id="vat" value="{{currentRecord.vat}}" defaultvalue="21" floatinglabel olbapro textalign="right" ></paper-input>
+          <paper-checkbox id="inactive" label="{{strings.Inactive}}" checked="{{currentRecord.inactive}}" olbapro ></paper-checkbox>
         </div>
       </core-collapse>
     </section>
@@ -38,11 +38,11 @@
       <paper-button label="{{strings.PriceList}}" on-click="{{collapsePrice}}"></paper-button>
         <core-collapse id="colPrice"  class="box" >
           <br>
-          <olbapro-grid  rows="5"  data="{{item.prices}}" selectionmode="none" id="gridPrices">
+          <olbapro-grid  rows="5"  data="{{currentRecord.prices}}" selectionmode="none" id="prices" insertallowed="false"  olbapro>
             <olbapro-columns>
-              <olbapro-column id="code" label="{{strings.Code}}"  width="60"  ></olbapro-column>
-              <olbapro-column id="name" label="{{strings.Name}}" width="150"></olbapro-column>
-              <olbapro-column id="price" label="{{strings.Price}}" width="100" updateallowed></olbapro-column>
+              <olbapro-column id="code" label="{{strings.Code}}"  width="60" insertallowed="false" updateallowed="false"></olbapro-column>
+              <olbapro-column id="name" label="{{strings.Name}}" width="150" insertallowed="false" updateallowed="false"></olbapro-column>
+              <olbapro-column id="price" label="{{strings.Price}}" width="100" updateallowed textalign="right" ></olbapro-column>
             </olbapro-columns>
           </olbapro-grid> 
 
@@ -58,9 +58,18 @@
 </template>
 <script>
  Polymer('olbapro-items', {
-  	item:{"itemcode":"","itemname":"","vat":21,"inactive":false,prices:[]},
+  	
     mode:"",
-   
+    ready:function(){
+      this.super();
+
+    },
+    newRecord:function(){
+      this.super();
+       for (var i=0;i<this.pricelist.length;i++){
+        this.register.prices.push({"code":this.pricelist[i].code,"name":this.pricelist[i].name,"price":0});
+      }
+    },
     collapseMaster:function(){
       this.$.colMaster.toggle();
     },
@@ -68,29 +77,40 @@
       this.$.colPrice.toggle();
     },
     pricelistChanged:function(){
-      var prices=this.item.prices;
-      this.item.prices=[];       
-      for (var i=0;i<this.pricelist.length;i++){
-        var arr=prices.filter(function(element,pos,arr,value){
-          if (element.code==this){
-            return true;
-          }
-          else{
-            return false;
-          }
+      this.checkPriceList();
+      this.registerChanged();
+    },   
+    registerChanged:function(){
+    this.checkPriceList();
+      this.super();
 
-        },this.pricelist[i].code);
-
-        var price=0;
-        if (arr.length>0){
-            price=arr[0].price;
-        }
-        this.item.prices.push({"code":this.pricelist[i].code,"name":this.pricelist[i].name,"price":price})
-      }
-    }
-    ,   
+    },
     listClick:function(){      
       this.$.itemlistdialog.show();
+    },
+    checkPriceList:function(){
+      var prices=this.register.prices;
+      this.register.prices=[];       
+      for (var i=0;i<this.pricelist.length;i++){
+        var price=0;
+        if (prices!=null){
+          var arr=prices.filter(function(element,pos,arr,value){
+            if (element.code==this){
+              return true;
+            }
+            else{
+              return false;
+            }
+
+          },this.pricelist[i].code);
+
+          
+          if (arr.length>0){
+              price=arr[0].price;
+          }
+        }
+        this.register.prices.push({"code":this.pricelist[i].code,"name":this.pricelist[i].name,"price":price})
+      }
     }
 
 
