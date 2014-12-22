@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
     <meta http-equiv="Content-Type" content="text/html; charset= ISO-8859-1" />
@@ -50,18 +50,18 @@
         body {
             margin: 0;
             font-family: Tahoma;
-    
+
         }
     </style>
-   
+
 </head>
-   
+
 <body>
     <polymer-element name="my-element">
 
   <template>
     <style>
-       
+
 
         :host {
         position: absolute;
@@ -79,7 +79,7 @@
             background-color: rgb(238, 238, 238);
         }
 
-             
+
     </style>
     <core-localstorage name="searchOcrd" value="{{searchOcrd}}"></core-localstorage>
     <core-localstorage id="localrowsOcrd" name="rowsOcrd" value="{{rowsOcrd}}"></core-localstorage>
@@ -94,7 +94,7 @@
         <section class="seccion">
           <app-login user="{{user}}" password="{{password}}" on-login="{{clickLogin}}"></app-login>
         </section>
-    
+
          <section>
              <app-listocrd id="listocrd" search="{{searchOcrd}}" rows="{{rowsOcrd}}" on-tapcard="{{tapOcrdList}}" on-addocrd="{{clickAddOcrd}}" on-refreshlist="{{refreshOcrd}}"></app-listocrd>
          </section>
@@ -117,7 +117,7 @@
             this.password="test";
           },
           clickLogin:function(){
-            this.$.olbapro_datasheet.login();            
+            this.$.olbapro_datasheet.login();
           },
           postLogin:function(){
             this.$.core_animated_pages.selected = 1;
@@ -134,10 +134,10 @@
             this.rowsOcrd.splice(this.$.olbapro_datasheet.position, 1);
             this.$.core_animated_pages.selected = 1;
           },
-          postCommitDetail: function () {            
+          postCommitDetail: function () {
               this.$.app_ocrddireccion.postUpdate();
               this.$.localrowsOcrd.save();
-          },          
+          },
           saveOcrd: function () {
               if (this.$.olbapro_datasheet.position == -1) {
                   this.$.olbapro_datasheet.addCurrentRow();
@@ -148,7 +148,7 @@
           },
           deleteOcrd: function () {
               if (this.$.olbapro_datasheet.position == -1) {
-                
+
               }
               else {
                   this.$.olbapro_datasheet.deleteCurrentRow();
@@ -176,7 +176,7 @@
             this.$.core_animated_pages.selected = 3;
           },
           clickAddOcrd: function () {
-  
+
               this.$.olbapro_datasheet.position = -1;
               this.$.olbapro_datasheet.currentRow = { cardcode: "", cardname: "", cardtype: "Supplier",recicled:"N", OCRD_DIRECCIONES: [] };
               this.$.core_animated_pages.selected = 2;
